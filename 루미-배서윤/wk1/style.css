@@ -37,6 +37,7 @@ body {
 .list-area {
   display: flex;
   justify-content: space-between;
+  margin-top: 15px;
 }
 
 .todo-list, .done-list {
@@ -49,7 +50,13 @@ ul {
 }
 
 li {
-  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 8px 10px;
+  background: #f9f9f9;
+  border-radius: 6px;
 }
 
 .complete-btn {
