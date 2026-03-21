@@ -1,5 +1,7 @@
-const todoInput = document.getElementById("todoInput") as HTMLInputElement;
-const add_button = document.getElementById("add_button");
+const todoInput = document.getElementById(
+  "panel__todoInput",
+) as HTMLInputElement;
+const add_button = document.getElementById("panel__button--add");
 const todoList = document.getElementById("todoList");
 const doneList = document.getElementById("doneList");
 
@@ -9,17 +11,16 @@ const handleAddToDo = (text: string) => {
   todo.classList.add("todo");
 
   const content = document.createElement("div");
-  content.classList.add("content");
   content.textContent = text;
   todo.appendChild(content);
 
   const doneButton = document.createElement("button");
-  doneButton.classList.add("doneButton");
+  doneButton.classList.add("ToDo__button--done");
   doneButton.textContent = "완료";
   todo.appendChild(doneButton);
 
   const deleteButton = document.createElement("button");
-  deleteButton.classList.add("delete");
+  deleteButton.classList.add("ToDo__button--delete");
   deleteButton.textContent = "삭제";
   todo.appendChild(deleteButton);
 

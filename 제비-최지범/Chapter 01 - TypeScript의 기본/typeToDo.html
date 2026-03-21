@@ -6,23 +6,19 @@
   />
 </head>
 
-<body class="head">
-  <div class="box">
-    <div class="ToDo_menu">
-        <h2 class="titleText">제비의 TS ToDo</h2>
-    </div>
-    <div class="inputBox">
-        <input id="todoInput" placeholder="할 일 입력">
-        <button id="add_button" type="button">추가</button>
-    </div>
-    <div class="ToDo_list">
-        <div class="list" id="todoList">
+<body class="body">
+    <div class="panel">
+        <h2 class="panel_titleText">제비의 TS ToDo</h2>
+      <div class="panel__form">
+        <input id="panel__todoInput" placeholder="할 일 입력">
+        <button id="panel__button--add" type="button">추가</button>
+      </div>
+    <div class="ToDolist-Container">
+        <div class="ToDolist-Container__list" id="todoList">
             <h3>할 일</h3>
-           
         </div>
-        <div class="list" id="doneList">
+        <div class="ToDolist-Container__list" id="doneList">
           <h3>완료</h3>
-       
         </div>
   </div>
   <script src="./dist/typeToDo.js"></script>
