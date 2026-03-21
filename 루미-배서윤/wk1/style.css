@@ -14,18 +14,18 @@ body {
   text-align: center;
 }
 
-.input-area {
+.todo__input {
   display: flex;
   gap: 5px;
   margin-bottom: 15px;
 }
 
-.input-area input {
+.todo__input-field {
   flex: 1;
   padding: 6px;
 }
 
-.input-area button {
+.todo__add-btn {
   padding: 6px 10px;
   background: green;
   color: white;
@@ -34,13 +34,13 @@ body {
   cursor: pointer;
 }
 
-.list-area {
+.todo__lists {
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
 }
 
-.todo-list, .done-list {
+.todo__list {
   width: 48%;
 }
 
