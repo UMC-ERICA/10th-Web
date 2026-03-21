@@ -14,25 +14,33 @@ body {
   text-align: center;
 }
 
-.todo__input {
+.input-area {
+  display: flex;
+  gap: 5px;
   margin-bottom: 15px;
 }
 
-.todo__input input {
-  width: 65%;
-  padding: 5px;
+.input-area input {
+  flex: 1;
+  padding: 6px;
 }
 
-.todo__input button {
-  padding: 6px;
+.input-area button {
+  padding: 6px 10px;
   background: green;
   color: white;
   border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.todo__lists {
+.list-area {
   display: flex;
   justify-content: space-between;
+}
+
+.todo-list, .done-list {
+  width: 48%;
 }
 
 ul {
@@ -49,6 +57,9 @@ li {
   color: white;
   border: none;
   margin-left: 5px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .delete-btn {
@@ -56,4 +67,7 @@ li {
   color: white;
   border: none;
   margin-left: 5px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  cursor: pointer;
 }

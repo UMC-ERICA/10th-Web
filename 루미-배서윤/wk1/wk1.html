@@ -8,20 +8,20 @@
 <body>
 
 <div class="todo">
-  <h2>LUMI TODO</h2>
+  <h2 class="todo__title">LUMI TODO</h2>
 
-  <div class="input-area">
-    <input type="text" id="todo-input" placeholder="할 일을 입력하세요">
-    <button id="add-btn">할 일 추가</button>
+  <div class="todo__input">
+    <input class="todo__input-field" type="text" id="todo-input" placeholder="할 일을 입력하세요">
+    <button class="todo__add-btn" id="add-btn">할 일 추가</button>
   </div>
 
-  <div class="list-area">
-    <div class="todo-list">
+  <div class="todo__lists">
+    <div class="todo__list">
       <h3>할 일</h3>
       <ul id="todo-list"></ul>
     </div>
 
-    <div class="done-list">
+    <div class="todo__list">
       <h3>완료</h3>
       <ul id="done-list"></ul>
     </div>
