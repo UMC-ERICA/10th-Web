@@ -1,6 +1,12 @@
 import { createContext, useContext, useState } from "react";
 import type { PropsWithChildren } from "react";
 
+export type Todo = {
+  id: string;
+  name: string;
+  state: 0 | 1;
+};
+
 type TodoContextValue = {
   todoList: Todo[];
   addTodo: (name: string) => void;
