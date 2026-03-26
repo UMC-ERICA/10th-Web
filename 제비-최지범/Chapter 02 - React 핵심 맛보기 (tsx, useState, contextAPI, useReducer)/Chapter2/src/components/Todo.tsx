@@ -1,4 +1,8 @@
-const Todo = ({ todo, handleDone, deleteTodo }) => {
+import { useTodo } from "../context/TodoContext";
+
+const Todo = ({ todo }) => {
+  const { handleDone, deleteTodo } = useTodo();
+
   return (
     <div className="todo">
       <div className="content">{todo.name}</div>

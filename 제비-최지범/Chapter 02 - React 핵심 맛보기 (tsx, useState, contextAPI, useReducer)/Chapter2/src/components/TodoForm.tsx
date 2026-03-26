@@ -1,19 +1,16 @@
 import { useState } from "react";
+import { useTodo } from "../context/TodoContext";
 
-const TodoForm = ({ setTodoList }) => {
+const TodoForm = () => {
   const [formData, setFormData] = useState<string>("");
+  const { addTodo } = useTodo();
 
-  const handleOnchange = (e: any) => {
+  const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(e.target.value);
   };
+
   const handleAddTodo = () => {
-    setTodoList((prev) =>
-      prev.concat({
-        name: formData,
-        state: 0,
-        id: String(new Date()) + "todo",
-      }),
-    );
+    addTodo(formData);
     setFormData("");
   };
 

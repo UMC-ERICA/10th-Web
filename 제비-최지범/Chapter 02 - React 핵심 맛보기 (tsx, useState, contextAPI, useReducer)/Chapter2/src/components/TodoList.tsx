@@ -1,6 +1,13 @@
 import Todo from "./Todo";
+import { useTodo } from "../context/TodoContext";
 
-export const TodoList = ({ state, handleDone, deleteTodo, todoList }) => {
+type TodoListProps = {
+  state: 0 | 1;
+};
+
+export const TodoList = ({ state }: TodoListProps) => {
+  const { todoList } = useTodo();
+
   return (
     <div
       className="ToDolist-Container__list"
@@ -10,13 +17,10 @@ export const TodoList = ({ state, handleDone, deleteTodo, todoList }) => {
       {todoList
         .filter((todo) => todo.state === state)
         .map((todo) => (
-          <Todo
-            key={todo.id}
-            todo={todo}
-            handleDone={handleDone}
-            deleteTodo={deleteTodo}
-          />
+          <Todo key={todo.id} todo={todo} />
         ))}
     </div>
   );
 };
+
+export default TodoList;
