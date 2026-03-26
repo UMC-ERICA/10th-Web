@@ -76,7 +76,8 @@ h3 {
   border-radius: 4px;
 }
 #todoList .ToDo__button--delete {
-  display: none;
+  position: absolute;
+  right: 100vw;
 }
 #todoList .ToDo__button--done {
   padding: 2px 5px;
@@ -86,7 +87,8 @@ h3 {
 }
 
 #doneList .ToDo__button--done {
-  display: none;
+  position: absolute;
+  right: 100vw;
 }
 #doneList .ToDo__button--delete {
   padding: 2px 5px;
