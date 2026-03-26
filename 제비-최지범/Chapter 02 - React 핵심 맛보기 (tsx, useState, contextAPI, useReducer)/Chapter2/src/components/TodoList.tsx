@@ -6,11 +6,11 @@ type TodoListProps = {
 };
 
 export const TodoList = ({ state }: TodoListProps) => {
-  const { todoList } = useTodo();
+  const { todoList, colorMode } = useTodo();
 
   return (
     <div
-      className="ToDolist-Container__list"
+      className={`ToDolist-Container__list ${colorMode === "color1" ? "bg-[#382a2a]" : "bg-[#374151]"}`}
       id={`${state === 0 ? "todoList" : "doneList"}`}
     >
       <h3>{state === 0 ? "할일" : "완료"}</h3>

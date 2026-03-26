@@ -12,12 +12,15 @@ type TodoContextValue = {
   addTodo: (name: string) => void;
   deleteTodo: (id: string) => void;
   handleDone: (id: string) => void;
+  colorMode: string;
+  setColorMode: (colorMode: string) => void;
 };
 
 const TodoContext = createContext<TodoContextValue | null>(null);
 
 export const TodoProvider = ({ children }: PropsWithChildren) => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
+  const [colorMode, setColorMode] = useState<string>("default");
 
   const addTodo = (name: string) => {
     const trimmed = name.trim();
@@ -43,7 +46,16 @@ export const TodoProvider = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <TodoContext.Provider value={{ todoList, addTodo, deleteTodo, handleDone }}>
+    <TodoContext.Provider
+      value={{
+        todoList,
+        addTodo,
+        deleteTodo,
+        handleDone,
+        colorMode,
+        setColorMode,
+      }}
+    >
       {children}
     </TodoContext.Provider>
   );
