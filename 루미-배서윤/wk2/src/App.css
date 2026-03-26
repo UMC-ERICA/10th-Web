@@ -1,0 +1,94 @@
+body {
+  background: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  margin-top: 100px;
+  font-family: Arial;
+}
+
+.todo-container {
+  background: white;
+  padding: 30px;
+  width: 500px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.todo-container__header {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.todo-container__form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.todo-container__input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.todo-container__button {
+  padding: 10px 15px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.render-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.render-container__section {
+  width: 100%;
+}
+
+.render-container__title {
+  margin-bottom: 10px;
+}
+
+.render-container__list {
+  list-style: none;
+  padding: 0;
+}
+
+.render-container__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.render-container__item-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/*버튼 글자 색상*/
+.render-container__item-button {
+  color: white;
+}
+
+/*완료 버튼*/
+.complete {
+  background: #4CAF50;
+}
+
+/*삭제 버튼*/
+.delete {
+  background: #e74c3c;
+}
