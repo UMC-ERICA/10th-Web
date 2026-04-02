@@ -24,14 +24,27 @@ const MoviesPage = () => {
   }, []);
 
   return (
-    <ul>
-      {movies?.map((movie) => (
-        <li key={movie.id}>
-          <h2>{movie.title}</h2>
-          <p>{movie.release_date}</p>
-        </li>
-      ))}
-    </ul>
+    <div className="bg-[#121212] text-white">
+      <ul className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-4 p-4">
+        {movies?.map((movie) => (
+          <li
+            key={movie.id}
+            className="relative overflow-hidden rounded hover:overflow-visible"
+          >
+            <img
+              className="w-full h-auto rounded  transition-all"
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              alt={movie.title}
+            />
+            <div className="absolute top-0 h-[100%] overflow-y-auto  inset-0 bg-[#12121250] backdrop-blur-md bg-opacity-70 opacity-0 hover:opacity-100 transition-opacity p-4 flex flex-col justify-bottom">
+              <h2 className="font-bold">{movie.title}</h2>
+              <p className="text-sm text-gray-300">{movie.overview}</p>
+              <p className="text-sm text-gray-400">{movie.release_date}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

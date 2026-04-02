@@ -17,7 +17,6 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        // /movies/뒤에 오는 값을 movieId라는 이름으로 받겠다는 뜻
         path: "movies/:movieId",
         element: <Movies />,
       },
