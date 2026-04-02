@@ -7,7 +7,7 @@ interface Movie {
   overview: string;
 }
 
-const API_KEY = "여기에_너_API_KEY";
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function MovieList() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -18,15 +18,15 @@ export default function MovieList() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log("데이터:", data);
+        console.log("받은 데이터:", data); 
         setMovies(data.results);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("에러:", err));
   }, []);
 
   return (
     <div>
-      <h1>🎬 영화 목록</h1>
+      <h1>영화 목록</h1>
       <p>총 {movies.length}개</p>
     </div>
   );
