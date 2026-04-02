@@ -3,7 +3,6 @@
   width: 100vw;
   align-content: center;
   justify-items: center;
-  background-color: #432c2c;
 }
 .panel {
   width: 500px;
@@ -57,7 +56,6 @@ button:hover {
   text-align: center;
   margin: 10px 0px;
   padding-bottom: 5px;
-  background-color: rgb(56, 42, 42);
   border-radius: 10px;
   padding: 0px 5px 5px 5px;
 }
@@ -76,7 +74,8 @@ h3 {
   border-radius: 4px;
 }
 #todoList .ToDo__button--delete {
-  display: none;
+  position: absolute;
+  right: 100vw;
 }
 #todoList .ToDo__button--done {
   padding: 2px 5px;
@@ -86,7 +85,8 @@ h3 {
 }
 
 #doneList .ToDo__button--done {
-  display: none;
+  position: absolute;
+  right: 100vw;
 }
 #doneList .ToDo__button--delete {
   padding: 2px 5px;
