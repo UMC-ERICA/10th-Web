@@ -1,13 +1,22 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./layout/Layout";
 import Home from "./pages/Home";
-import MovieDetail from "./pages/MovieDetail";
+import Popular from "./pages/Popular";
+import Upcoming from "./pages/Upcoming";
+import TopRated from "./pages/TopRated";
+import NowPlaying from "./pages/NowPlaying";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/movies/:movieId" element={<MovieDetail />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="popular" element={<Popular />} />
+          <Route path="upcoming" element={<Upcoming />} />
+          <Route path="top-rated" element={<TopRated />} />
+          <Route path="now-playing" element={<NowPlaying />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

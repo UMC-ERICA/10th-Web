@@ -1,5 +1,5 @@
-import MovieList from "../components/MovieList";
+import Popular from "./Popular";
 
 export default function Home() {
-  return <MovieList />;
+  return <Popular />;
 }
