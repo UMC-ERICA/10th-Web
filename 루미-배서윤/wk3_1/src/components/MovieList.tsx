@@ -40,7 +40,7 @@ export default function MovieList() {
               className="w-full rounded-lg transition duration-300 group-hover:blur-sm"
             />
 
-            {/*Hover 정보*/}
+            {/*Hover*/}
             <div className="absolute inset-0 bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition flex flex-col justify-center items-center text-white p-2 text-center">
               <h2 className="font-bold text-sm">{movie.title}</h2>
               <p className="text-xs mt-2 line-clamp-3">
