@@ -1,20 +1,38 @@
 import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Navbar = () => {
+  const { category } = useParams<{ category: string }>();
+
   return (
-    <nav className="w-full bg-[#121212] p-3 text-white flex items-center justify-start gap-4">
+    <nav className="fixed z-10 w-full bg-[#121212] p-3 text-white flex items-center justify-start gap-4">
       <h1 className="font-bold text-lg">제비의 영화 정보 사이트</h1>
-      <Link
-        className="p-1 bg-[#133122]  rounded hover:bg-[#1a4f1a] transition-colorss"
-        to="/"
-      >
-        홈 페이지로 이동
+      <Link className={category === undefined ? "text-red-500" : ""} to="/">
+        홈
       </Link>
       <Link
-        className="p-1 bg-[#133122] rounded hover:bg-[#1a4f1a] transition-colors"
-        to="/movies/1"
+        className={category === "popular" ? "text-red-500" : ""}
+        to="/movies/popular"
       >
-        영화 목록 페이지로 이동
+        인기 영화
+      </Link>
+      <Link
+        className={category === "upcoming" ? "text-red-500" : ""}
+        to="/movies/upcoming"
+      >
+        개봉 예정
+      </Link>
+      <Link
+        className={category === "top_rated" ? "text-red-500" : ""}
+        to="/movies/top_rated"
+      >
+        평점 높은
+      </Link>
+      <Link
+        className={category === "now_playing" ? "text-red-500" : ""}
+        to="/movies/now_playing"
+      >
+        상영 중
       </Link>
     </nav>
   );

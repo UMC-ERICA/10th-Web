@@ -14,3 +14,28 @@ export type MovieResponse = {
   total_pages: number;
   total_results: number;
 };
+export type MovieDetailResponse = {
+  id: number;
+  title: string;
+  release_date: string;
+  poster_path: string;
+  overview: string;
+  runtime: number;
+  vote_average: number;
+  genres: { id: number; name: string }[];
+};
+
+export type Member = {
+  gender: number;
+  id: number;
+  known_for_department: string;
+  name: string;
+  original_name: string;
+  profile_path: string | null;
+  popularity: number;
+};
+
+export type MovieCredit = {
+  cast: Member[];
+  crew: Member[];
+};
