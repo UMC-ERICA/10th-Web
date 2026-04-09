@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../components/Spinner";
+import useCustomFetch from "../hooks/useCustomFetch";
 
 type Genre = {
   id: number;
@@ -26,66 +26,53 @@ type CastMember = {
   profile_path: string | null;
 };
 
+type CreditsResponse = {
+  cast: CastMember[];
+};
+
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 function MovieDetail() {
   const { id } = useParams<{ id: string }>();
 
-  const [movie, setMovie] = useState<MovieDetailData | null>(null);
-  const [cast, setCast] = useState<CastMember[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  if (!id) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="rounded-2xl border border-red-500/20 bg-zinc-900 px-10 py-8 text-center shadow-xl">
+          <p className="text-gray-300">영화 ID를 찾을 수 없습니다.</p>
+        </div>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    const fetchMovieDetail = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  if (!API_KEY) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="rounded-2xl border border-red-500/20 bg-zinc-900 px-10 py-8 text-center shadow-xl">
+          <p className="text-gray-300">API 키가 설정되지 않았습니다.</p>
+        </div>
+      </div>
+    );
+  }
 
-        if (!id) {
-          throw new Error("영화 ID를 찾을 수 없습니다.");
-        }
+  const detailUrl = `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=ko-KR`;
+  const creditsUrl = `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${API_KEY}&language=ko-KR`;
 
-        if (!API_KEY) {
-          throw new Error("API 키가 설정되지 않았습니다.");
-        }
+  const {
+    data: movie,
+    isLoading: detailLoading,
+    error: detailError,
+  } = useCustomFetch<MovieDetailData>(detailUrl);
 
-        const [detailResponse, creditsResponse] = await Promise.all([
-          fetch(
-            `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=ko-KR`
-          ),
-          fetch(
-            `https://api.themoviedb.org/3/movie/${id}/credits?api_key=${API_KEY}&language=ko-KR`
-          ),
-        ]);
+  const {
+    data: credits,
+    isLoading: creditsLoading,
+    error: creditsError,
+  } = useCustomFetch<CreditsResponse>(creditsUrl);
 
-        if (!detailResponse.ok) {
-          throw new Error("영화 상세 정보를 불러오지 못했습니다.");
-        }
-
-        if (!creditsResponse.ok) {
-          throw new Error("출연진 정보를 불러오지 못했습니다.");
-        }
-
-        const detailData: MovieDetailData = await detailResponse.json();
-        const creditsData = await creditsResponse.json();
-
-        setMovie(detailData);
-        setCast(creditsData.cast?.slice(0, 12) ?? []);
-      } catch (err) {
-        console.error(err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "영화 상세 정보를 불러오는 중 문제가 발생했습니다."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMovieDetail();
-  }, [id]);
+  const isLoading = detailLoading || creditsLoading;
+  const error = detailError || creditsError;
+  const cast = credits?.cast?.slice(0, 12) ?? [];
 
   if (isLoading) {
     return <Spinner />;
