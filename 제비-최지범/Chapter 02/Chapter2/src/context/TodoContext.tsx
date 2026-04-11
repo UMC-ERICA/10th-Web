@@ -20,7 +20,7 @@ const TodoContext = createContext<TodoContextValue | null>(null);
 
 export const TodoProvider = ({ children }: PropsWithChildren) => {
   const [todoList, setTodoList] = useState<Todo[]>([]);
-  const [colorMode, setColorMode] = useState<string>("default");
+  const [colorMode, setColorMode] = useState<string>("color1");
 
   const addTodo = (name: string) => {
     const trimmed = name.trim();
