@@ -1,43 +1,16 @@
 import { useEffect, useState } from "react";
-import type { Movie, MovieResponse } from "../types/movie";
-import axios from "axios";
-import { Link, useParams } from "react-router-dom";
 
-const rawToken = import.meta.env.VITE_TOKEN ?? "";
-const bearerToken = rawToken.replace(/^Bearer\s+/i, "").trim();
+import { Link, useParams } from "react-router-dom";
+import useFetch from "../hooks/useFetch";
 
 const MoviesPage = () => {
   const { category } = useParams<{ category: string }>();
   const [page, setPage] = useState<number>(1);
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fetchMovies, loading, error, movies] = useFetch(category, page);
+
   useEffect(() => {
     if (!category) return;
-
-    const fetchMovies = async () => {
-      setLoading(true);
-      const url = `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`;
-      try {
-        const response = await axios.get<MovieResponse>(`${url}`, {
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${bearerToken}`,
-          },
-        });
-        setMovies(response.data.results);
-      } catch (error) {
-        setError("데이터를 불러오는중 오류가 생겼습니다.");
-        console.log("에러내용:", error);
-      }
-
-      setLoading(false);
-    };
-
     fetchMovies();
-    return () => {
-      setMovies([]);
-    };
   }, [category, page]);
 
   useEffect(() => {

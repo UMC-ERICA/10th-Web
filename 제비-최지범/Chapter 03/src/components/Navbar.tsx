@@ -34,6 +34,14 @@ const Navbar = () => {
       >
         상영 중
       </Link>
+      <div className="flex items-center justify-center gap-4">
+        <Link className="text-red-500" to="/login">
+          로그인
+        </Link>
+        <Link className="text-red-500" to="/signup">
+          회원가입
+        </Link>
+      </div>
     </nav>
   );
 };

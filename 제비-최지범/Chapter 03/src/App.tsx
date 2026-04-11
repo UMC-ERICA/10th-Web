@@ -6,6 +6,8 @@ import NotFound from "./pages/Not-Found";
 import Movies from "./pages/MoviesPage";
 import RootLayout from "./layout/root-layout";
 import MovieDetail from "./pages/MovieDetail";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,8 @@ const router = createBrowserRouter([
         path: "movie/:movieId",
         element: <MovieDetail />,
       },
+      { path: "login", element: <Login /> },
+      { path: "signup", element: <Signup /> },
     ],
   },
 ]);
