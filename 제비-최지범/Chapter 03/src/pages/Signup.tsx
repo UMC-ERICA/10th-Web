@@ -22,33 +22,39 @@ const Signup = () => {
   const { register, handleSubmit } = useForm<FormData>();
 
   const handleNext = (data: FormData) => {
+    let message = "";
     if (state === 0) {
       if (!data.email.includes("@") && !data.email.includes(".")) {
-        setError("이메일 형식이 올바르지 않습니다.");
+        message = "이메일 형식이 올바르지 않습니다.";
       } else {
-        setError("");
+        message = "";
       }
-      if (error) {
+      if (message.length > 0) {
+        setError(message);
         return;
       }
       setState(1);
     } else if (state === 1) {
       if (data.password.length < 6) {
-        setError("비밀번호는 6자 이상이어야 합니다.");
+        message = "비밀번호는 6자 이상이어야 합니다.";
       } else if (data.password !== data.passwordConfirm) {
-        setError("비밀번호가 일치하지 않습니다.");
+        message = "비밀번호가 일치하지 않습니다.";
+      } else {
+        message = "";
       }
-      if (error) {
+      if (message.length > 0) {
+        setError(message);
         return;
       }
       setState(2);
     } else if (state === 2) {
       if (data.name.length < 2) {
-        setError("이름은 2자 이상이어야 합니다.");
+        message = "이름은 2자 이상이어야 합니다.";
       } else {
-        setError("");
+        message = "";
       }
-      if (error) {
+      if (message.length > 0) {
+        setError(message);
         return;
       }
       console.log(data);
@@ -135,7 +141,9 @@ const Signup = () => {
             ></input>
           </div>
         )}
-
+        {error.length > 0 && (
+          <div className="text-red-500 text-sm">{error}</div>
+        )}
         <button
           type="submit"
           className={`mt-4 w-full p-2 rounded-lg bg-red-500 text-white `}

@@ -14,14 +14,16 @@ const Login = () => {
   const { register, handleSubmit } = useForm<FormData>();
   const [error, setError] = useState("");
   const handleLogin = (data: FormData) => {
+    let message = "";
     if (!data.email.includes("@") && !data.email.includes(".")) {
-      setError("이메일 형식이 올바르지 않습니다.");
+      message = "이메일 형식이 올바르지 않습니다.";
     } else if (data.password.length < 6) {
-      setError("비밀번호는 6자 이상이어야 합니다.");
+      message = "비밀번호는 6자 이상이어야 합니다.";
     } else {
-      setError("");
+      message = "";
     }
-    if (error) {
+    if (message.length > 0) {
+      setError(message);
       return;
     }
     console.log(data);
