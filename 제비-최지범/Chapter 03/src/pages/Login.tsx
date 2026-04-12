@@ -1,43 +1,36 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-import useForm from "../hooks/useForm";
+import z from "zod";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const Login = () => {
-  const [formData, handleChange] = useForm({ email: "", password: "" });
-  const { email, password } = formData;
+  const { register, handleSubmit } = useForm<FormData>();
   const [error, setError] = useState("");
-  const [buttonDisabled, setButtonDisabled] = useState(true);
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(email, password);
-  };
-  useEffect(() => {
-    if (email && password) {
-      if (!email.includes("@")) {
-        setError("이메일 형식이 올바르지 않습니다.");
-        setButtonDisabled(true);
-      } else if (email.length === 0) {
-        setError("이메일을 입력해주세요.");
-        setButtonDisabled(true);
-      } else if (password.length === 0) {
-        setError("비밀번호를 입력해주세요.");
-        setButtonDisabled(true);
-      } else if (!email.includes(".")) {
-        setError("이메일 형식이 올바르지 않습니다.");
-        setButtonDisabled(true);
-      } else if (password.length < 6) {
-        setError("비밀번호는 6자 이상이어야 합니다.");
-        setButtonDisabled(true);
-      } else {
-        setError("");
-        setButtonDisabled(false);
-      }
+  const handleLogin = (data: FormData) => {
+    if (!data.email.includes("@") && !data.email.includes(".")) {
+      setError("이메일 형식이 올바르지 않습니다.");
+    } else if (data.password.length < 6) {
+      setError("비밀번호는 6자 이상이어야 합니다.");
+    } else {
+      setError("");
     }
-  }, [email, password]);
+    if (error) {
+      return;
+    }
+    console.log(data);
+  };
+
   return (
     <div className="bg-[#121212] flex flex-col items-center justify-center h-screen">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(handleLogin)}
         className="w-full max-w-md border border-gray-300 rounded-lg"
       >
         <div className="w-full max-w-md text-white p-4 rounded-lg flex flex-row items-center justify-between">
@@ -52,16 +45,12 @@ const Login = () => {
           <p className="text-sm">또는</p>
           <div className="w-full">
             <input
-              value={email}
-              name="email"
-              onChange={handleChange}
+              {...register("email")}
               placeholder="이메일"
               className="w-full p-2 rounded-lg border border-gray-300"
             ></input>
             <input
-              value={password}
-              name="password"
-              onChange={handleChange}
+              {...register("password")}
               placeholder="비밀번호"
               type="password"
               className="w-full p-2 rounded-lg border border-gray-300"
@@ -69,7 +58,8 @@ const Login = () => {
           </div>
           <div className="text-red-500 text-sm">{error}</div>
           <button
-            className={`mt-4 w-full p-2 rounded-lg bg-red-500 text-white ${buttonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            className="mt-4 w-full p-2 rounded-lg bg-red-500 text-white"
+            type="submit"
           >
             로그인
           </button>

@@ -1,79 +1,67 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import useForm from "../hooks/useForm";
+import { useForm } from "react-hook-form";
+import z from "zod";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  passwordConfirm: z.string().min(6),
+  name: z.string().min(2),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const Signup = () => {
   const navigate = useNavigate();
   const [state, setState] = useState(0);
-  const [error, setError] = useState("");
-  const [buttonDisabled, setButtonDisabled] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [formData, handleChange] = useForm({
-    email: "",
-    password: "",
-    passwordConfirm: "",
-    name: "",
-  });
-  const { email, password, passwordConfirm, name } = formData;
-  const handleNext = (e) => {
-    e.preventDefault();
+
+  const { register, handleSubmit } = useForm<FormData>();
+
+  const handleNext = (data: FormData) => {
     if (state === 0) {
+      if (!data.email.includes("@") && !data.email.includes(".")) {
+        setError("이메일 형식이 올바르지 않습니다.");
+      } else {
+        setError("");
+      }
+      if (error) {
+        return;
+      }
       setState(1);
     } else if (state === 1) {
+      if (data.password.length < 6) {
+        setError("비밀번호는 6자 이상이어야 합니다.");
+      } else if (data.password !== data.passwordConfirm) {
+        setError("비밀번호가 일치하지 않습니다.");
+      }
+      if (error) {
+        return;
+      }
       setState(2);
-    }
-    if (state === 2) {
-      console.log(formData);
+    } else if (state === 2) {
+      if (data.name.length < 2) {
+        setError("이름은 2자 이상이어야 합니다.");
+      } else {
+        setError("");
+      }
+      if (error) {
+        return;
+      }
+      console.log(data);
       navigate("/");
     }
   };
-  useEffect(() => {
-    if (state === 0) {
-      if (!email.includes("@")) {
-        setError("이메일 형식이 올바르지 않습니다.");
-        setButtonDisabled(true);
-      } else if (!email.includes(".")) {
-        setError("이메일 형식이 올바르지 않습니다.");
-        setButtonDisabled(true);
-      } else if (email.length === 0) {
-        setError("이메일을 입력해주세요.");
-        setButtonDisabled(true);
-      } else {
-        setError("");
-        setButtonDisabled(false);
-      }
-    } else if (state === 1) {
-      if (password.length === 0) {
-        setError("비밀번호를 입력해주세요.");
-        setButtonDisabled(true);
-      } else if (password.length < 6) {
-        setError("비밀번호는 6자 이상이어야 합니다.");
-        setButtonDisabled(true);
-      } else if (passwordConfirm.length === 0) {
-        setError("비밀번호 확인을 입력해주세요.");
-        setButtonDisabled(true);
-      } else if (passwordConfirm !== password) {
-        setError("비밀번호가 일치하지 않습니다.");
-        setButtonDisabled(true);
-      } else {
-        setError("");
-        setButtonDisabled(false);
-      }
-    } else if (state === 2) {
-      if (name.length === 0) {
-        setError("이름을 입력해주세요.");
-        setButtonDisabled(true);
-      } else {
-        setError("");
-        setButtonDisabled(false);
-      }
-    }
-  }, [email, password, passwordConfirm, name, state]);
 
   return (
     <div className="bg-[#121212] flex flex-col items-center justify-center h-screen">
-      <form className="w-full max-w-md border border-gray-300 rounded-lg">
+      <form
+        onSubmit={handleSubmit(handleNext)}
+        className="w-full max-w-md border border-gray-300 rounded-lg"
+      >
         <div className="w-full max-w-md text-white p-4 rounded-lg flex flex-row items-center justify-between">
           <Link to="/">뒤로가기</Link>
           <h1 className="text-2xl font-bold">회원가입</h1>
@@ -101,9 +89,8 @@ const Signup = () => {
           <div className="w-full">
             <input
               placeholder="이메일"
-              name="email"
               className="w-full text-white p-2 rounded-lg border border-gray-300"
-              onChange={handleChange}
+              {...register("email")}
             ></input>
           </div>
         )}
@@ -111,12 +98,10 @@ const Signup = () => {
           <div className="w-full">
             <div className="flex flex-row items-center justify-between">
               <input
-                value={password}
+                {...register("password")}
                 type={showPassword ? "text" : "password"}
                 placeholder="비밀번호"
-                name="password"
                 className="w-full text-white p-2 rounded-lg border border-gray-300"
-                onChange={handleChange}
               ></input>{" "}
               <div
                 onClick={() => setShowPassword(!showPassword)}
@@ -127,12 +112,10 @@ const Signup = () => {
             </div>
             <div className="flex flex-row items-center justify-between">
               <input
-                value={passwordConfirm}
+                {...register("passwordConfirm")}
                 type={showPasswordConfirm ? "text" : "password"}
                 placeholder="비밀번호 확인"
-                name="passwordConfirm"
                 className="w-full text-white p-2 rounded-lg border border-gray-300"
-                onChange={handleChange}
               ></input>
               <div
                 onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
@@ -146,19 +129,16 @@ const Signup = () => {
         {state === 2 && (
           <div className="w-full">
             <input
-              value={name}
+              {...register("name")}
               placeholder="이름"
-              name="name"
               className="w-full text-white p-2 rounded-lg border border-gray-300"
-              onChange={handleChange}
             ></input>
           </div>
         )}
 
-        <div className="text-red-500 text-sm">{error}</div>
         <button
-          onClick={(e) => handleNext(e)}
-          className={`mt-4 w-full p-2 rounded-lg bg-red-500 text-white ${buttonDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          type="submit"
+          className={`mt-4 w-full p-2 rounded-lg bg-red-500 text-white `}
         >
           {state < 2 ? "다음" : "회원가입"}
         </button>
