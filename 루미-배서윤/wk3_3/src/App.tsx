@@ -6,6 +6,8 @@ import Upcoming from "./pages/Upcoming";
 import TopRated from "./pages/TopRated";
 import NowPlaying from "./pages/NowPlaying";
 import MovieDetail from "./pages/MovieDetail";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function App() {
   return (
@@ -19,6 +21,9 @@ function App() {
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<MovieDetail />} />
         </Route>
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </BrowserRouter>
   );
