@@ -9,10 +9,14 @@ import MovieDetail from "./pages/MovieDetail";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
+import ProtectedRoute from "./router/ProtectedRoute";
+import Premium from "./pages/Premium";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* 공통 레이아웃 */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="popular" element={<Popular />} />
@@ -20,8 +24,19 @@ function App() {
           <Route path="top-rated" element={<TopRated />} />
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<MovieDetail />} />
+
+          {/* 보호된 라우트 */}
+          <Route
+            path="premium"
+            element={
+              <ProtectedRoute>
+                <Premium />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
+        {/* 인증 관련 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
