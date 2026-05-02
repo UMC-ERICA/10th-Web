@@ -1,6 +1,7 @@
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useForm from "../hooks/useForm";
-import { login } from "../router/auth";
+import { setTokens } from "../router/auth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,18 +11,36 @@ export default function Login() {
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isValid) return;
 
-    // 로그인 처리
-    login();
+    try {
+      // 로그인 API 호출 (Swagger 확인해서 경로 맞추기)
+      const response = await axios.post(
+        "http://localhost:8000/v1/auth/signin",
+        {
+          email: values.email,
+          password: values.password,
+        }
+      );
 
-    alert("로그인 성공");
+      // access + refresh 토큰 저장
+      const { accessToken, refreshToken } = response.data;
 
-    // React Router 방식 이동
-    navigate("/premium");
+      setTokens(accessToken, refreshToken);
+
+      alert("로그인 성공");
+
+      // premium 페이지 이동
+      navigate("/premium");
+    } catch (error: any) {
+      console.error("로그인 실패 전체:", error);
+      console.error("응답 상태:", error.response?.status);
+      console.error("응답 데이터:", error.response?.data);
+      alert("로그인 실패");
+    }
   };
 
   return (
