@@ -88,6 +88,15 @@ export default function Login() {
           >
             로그인
           </button>
+
+          <button
+            onClick={() => {
+              window.location.href =
+                "http://localhost:8000/v1/auth/google/login";
+            }}
+          >
+            구글 로그인
+          </button>
         </form>
       </div>
     </div>
