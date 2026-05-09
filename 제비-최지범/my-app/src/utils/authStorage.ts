@@ -1,4 +1,7 @@
-import { LOCAL_STORAGE_KEY } from "../constants/key";
+import {
+  GOOGLE_OAUTH_SESSION_STORAGE_PREFIX,
+  LOCAL_STORAGE_KEY,
+} from "../constants/key";
 
 const parseStoredString = (key: string): string | null => {
   try {
@@ -32,7 +35,21 @@ export const setStoredAuthTokens = (
   );
 };
 
+export const clearGoogleOAuthSessionDedupeKeys = () => {
+  try {
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+      const key = sessionStorage.key(i);
+      if (key?.startsWith(GOOGLE_OAUTH_SESSION_STORAGE_PREFIX)) {
+        sessionStorage.removeItem(key);
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+};
+
 export const clearStoredAuthTokens = () => {
   localStorage.removeItem(LOCAL_STORAGE_KEY.ACCESS_TOKEN);
   localStorage.removeItem(LOCAL_STORAGE_KEY.REFRESH_TOKEN);
+  clearGoogleOAuthSessionDedupeKeys();
 };
