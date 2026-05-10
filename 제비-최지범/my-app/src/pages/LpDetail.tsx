@@ -3,7 +3,9 @@ import { useOutletContext } from "react-router-dom";
 
 import type { ResponseMyInfoDto } from "../types/auth";
 import { useGetLpDetail } from "../hooks/useGetLpList";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import CommentList from "../components/CommentList";
 
 const LpDetail = () => {
   const { lpId } = useParams();
@@ -11,7 +13,7 @@ const LpDetail = () => {
   const { data, refetch, isPending, isError, error } = useGetLpDetail(
     Number(lpId),
   );
-
+  const [openCommentList, setOpenCommentList] = useState(false);
   useEffect(() => {
     refetch();
   }, [lpId]);
@@ -21,7 +23,7 @@ const LpDetail = () => {
   if (error) return <div>오류: {error.message}</div>;
 
   return (
-    <div>
+    <div className="relative">
       <div className="p-4 text-black flex flex-col  gap-4 h-full items-center">
         <h4 className="text-black text-2xl font-bold">{data?.title}</h4>
         {data?.authorId === myInfo?.id ? (
@@ -56,6 +58,14 @@ const LpDetail = () => {
             ))}
           </div>
         </div>
+      </div>
+      <div className="p-4">
+        <button onClick={() => setOpenCommentList(!openCommentList)}>
+          댓글 보기
+        </button>
+        {openCommentList && (
+          <CommentList setOpenCommentList={setOpenCommentList} />
+        )}
       </div>
     </div>
   );

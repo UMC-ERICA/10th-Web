@@ -12,3 +12,9 @@ export type LP = {
   likes: { id: number; userId: number; lpId: number }[];
   // 필요하다면 추가 필드도 정의 가능
 };
+
+export type LpResponseDto = {
+  data: LP[];
+  nextCursor: number;
+  hasNext: boolean;
+};
