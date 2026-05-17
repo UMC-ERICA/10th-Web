@@ -15,8 +15,6 @@ import LpList from "./pages/LpList";
 import LpDetail from "./pages/LpDetail";
 import LpAdd from "./pages/LpAdd";
 
-const queryClient = new QueryClient();
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -76,6 +74,8 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+
+export const queryClient = new QueryClient();
 
 function App() {
   return (
