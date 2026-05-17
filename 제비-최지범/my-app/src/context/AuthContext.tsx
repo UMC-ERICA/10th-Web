@@ -12,6 +12,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
 import { postSignin } from "../apis/auth";
 import {
+  clearGoogleOAuthSessionDedupeKeys,
   getStoredAccessToken,
   getStoredRefreshToken,
 } from "../utils/authStorage";
@@ -61,6 +62,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setRefreshToken(null);
         removeAccessTokenFromStorage();
         removeRefreshTokenFromStorage();
+        clearGoogleOAuthSessionDedupeKeys();
       },
     });
   }, [removeAccessTokenFromStorage, removeRefreshTokenFromStorage]);
@@ -92,6 +94,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     setRefreshToken(null);
     removeAccessTokenFromStorage();
     removeRefreshTokenFromStorage();
+    clearGoogleOAuthSessionDedupeKeys();
   }, [removeAccessTokenFromStorage, removeRefreshTokenFromStorage]);
 
   const value = useMemo(
@@ -105,7 +108,5 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     [accessToken, refreshToken, login, setTokens, logout],
   );
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

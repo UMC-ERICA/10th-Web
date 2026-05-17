@@ -8,7 +8,14 @@ import LoginPage from "./pages/LoginPage";
 import Mypage from "./pages/Mypage";
 import SignupPage from "./pages/SignupPage";
 import HomeLayout from "./Layout/HomeLayout";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import LpList from "./pages/LpList";
+import LpDetail from "./pages/LpDetail";
+import LpAdd from "./pages/LpAdd";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -21,6 +28,33 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: "lps",
+        loader: requireAuthLoader,
+        element: (
+          <ProtectedRoute>
+            <LpList />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "lps/:lpId",
+        loader: requireAuthLoader,
+        element: (
+          <ProtectedRoute>
+            <LpDetail />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "lps/add",
+        loader: requireAuthLoader,
+        element: (
+          <ProtectedRoute>
+            <LpAdd />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "login",
         element: <LoginPage />,
       },
@@ -28,6 +62,7 @@ const router = createBrowserRouter([
         path: "v1/auth/google/callback",
         element: <GoogleCallbackPage />,
       },
+
       { path: "signup", element: <SignupPage /> },
       {
         path: "mypage",
@@ -45,7 +80,14 @@ const router = createBrowserRouter([
 function App() {
   return (
     <>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-left"
+          position="bottom"
+        />
+      </QueryClientProvider>
     </>
   );
 }

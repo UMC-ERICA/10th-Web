@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { GOOGLE_OAUTH_SESSION_STORAGE_PREFIX } from "../constants/key";
 import { useAuth } from "../hooks/useAuth";
 
 const GoogleCallbackPage = () => {
@@ -16,7 +17,7 @@ const GoogleCallbackPage = () => {
       return;
     }
 
-    const dedupeKey = `google-oauth-${accessToken.slice(0, 32)}`;
+    const dedupeKey = `${GOOGLE_OAUTH_SESSION_STORAGE_PREFIX}:${accessToken}:${refreshToken}`;
     if (sessionStorage.getItem(dedupeKey)) {
       navigate("/", { replace: true });
       return;
