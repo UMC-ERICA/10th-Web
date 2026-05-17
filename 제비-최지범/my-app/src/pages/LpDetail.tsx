@@ -6,6 +6,8 @@ import { useGetLpDetail } from "../hooks/useGetLpList";
 import { useEffect, useState } from "react";
 
 import CommentList from "../components/CommentList";
+import useDeleteLike from "../hooks/mutations/useDeleteLike";
+import usePostLike from "../hooks/mutations/usePostLike";
 
 const LpDetail = () => {
   const { lpId } = useParams();
@@ -17,6 +19,21 @@ const LpDetail = () => {
   useEffect(() => {
     refetch();
   }, [lpId]);
+
+  const { mutate: likeMutation } = usePostLike();
+  const { mutate: dislikeMutation } = useDeleteLike();
+
+  const handleLike = () => {
+    const id = Number(lpId);
+    if (
+      data?.likes.some((like) => like.userId === myInfo?.id) &&
+      myInfo?.id
+    ) {
+      dislikeMutation({ lpId: id, userId: myInfo.id });
+    } else {
+      likeMutation(id);
+    }
+  };
 
   if (isPending) return <div>LP 정보를 불러오는 중...</div>;
   if (isError) return <div>LP 정보를 불러오는 중 오류가 생겼습니다.</div>;
@@ -41,9 +58,12 @@ const LpDetail = () => {
           </p>
         </div>
         <div>
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex gap-4 justify-between items-center mb-2">
             <p className="text-[0.8rem] text-black">{data?.createdAt}</p>
-            <p className="text-sm text-black text-right">
+            <p
+              className={`text-sm text-black text-right ${data?.likes.some((like) => like.userId === myInfo?.id) ? "text-blue-500 cursor-pointer" : "cursor-pointer text-gray-500"} `}
+              onClick={handleLike}
+            >
               {data?.likes?.length} 좋아요
             </p>
           </div>
