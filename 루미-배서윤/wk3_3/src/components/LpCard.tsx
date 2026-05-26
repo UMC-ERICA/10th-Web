@@ -28,10 +28,14 @@ export default function LpCard({ lp }: LpCardProps) {
 
       <div className="absolute inset-0 flex flex-col justify-end bg-black/70 p-3 text-left opacity-0 transition duration-300 group-hover:opacity-100">
         <p className="line-clamp-2 text-sm font-bold text-white">{lp.title}</p>
+
         <p className="mt-1 text-xs text-gray-300">
           {new Date(lp.createdAt).toLocaleDateString()}
         </p>
-        <p className="mt-1 text-xs text-gray-300">♥ {lp.likes ?? 0}</p>
+
+        <p className="mt-1 text-xs text-gray-300">
+          ♥ {lp.likes?.length ?? 0}
+        </p>
       </div>
     </button>
   );

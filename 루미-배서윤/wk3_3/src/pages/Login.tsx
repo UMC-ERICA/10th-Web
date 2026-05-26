@@ -1,7 +1,22 @@
-import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
+import axiosInstance from "../apis/axiosInstance";
 import useForm from "../hooks/useForm";
 import { setTokens } from "../router/auth";
+
+type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+const login = async ({ email, password }: LoginRequest) => {
+  const response = await axiosInstance.post("/v1/auth/signin", {
+    email,
+    password,
+  });
+
+  return response.data;
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -14,37 +29,51 @@ export default function Login() {
     password: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const loginMutation = useMutation({
+    mutationFn: login,
+    onSuccess: (data) => {
+      const accessToken =
+        data?.data?.accessToken ?? data?.accessToken;
+
+      const refreshToken =
+        data?.data?.refreshToken ?? data?.refreshToken;
+
+      if (!accessToken || !refreshToken) {
+        alert("토큰을 찾을 수 없습니다.");
+        return;
+      }
+
+      setTokens(accessToken, refreshToken);
+
+      const userId = data?.data?.id;
+      const nickname = data?.data?.name;
+
+      if (userId) localStorage.setItem("userId", String(userId));
+      if (nickname) localStorage.setItem("nickname", nickname);
+      localStorage.setItem("email", values.email);
+
+      alert("로그인 성공");
+      navigate(from, { replace: true });
+    },
+    onError: () => {
+      alert("로그인 실패");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isValid) return;
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/v1/auth/signin",
-        {
-          email: values.email,
-          password: values.password,
-        }
-      );
-
-      const { accessToken, refreshToken } = response.data;
-
-      setTokens(accessToken, refreshToken);
-
-      alert("로그인 성공");
-
-      navigate(from, { replace: true });
-    } catch (error: any) {
-      console.error("로그인 실패 전체:", error);
-      console.error("응답 상태:", error.response?.status);
-      console.error("응답 데이터:", error.response?.data);
-      alert("로그인 실패");
-    }
+    loginMutation.mutate({
+      email: values.email,
+      password: values.password,
+    });
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8000/v1/auth/google/login";
+    window.location.href =
+      "http://localhost:8000/v1/auth/google/login";
   };
 
   return (
@@ -91,14 +120,14 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || loginMutation.isPending}
             className={`w-full rounded-md py-3 font-semibold ${
               isValid
                 ? "bg-pink-500 text-white"
                 : "bg-gray-600 text-gray-300"
             }`}
           >
-            로그인
+            {loginMutation.isPending ? "로그인 중..." : "로그인"}
           </button>
 
           <button

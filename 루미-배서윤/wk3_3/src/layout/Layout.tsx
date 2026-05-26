@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import CreateLpModal from "../components/CreateLpModal";
 
 function Layout() {
-  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLpModalOpen, setIsLpModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -32,11 +33,15 @@ function Layout() {
 
       <button
         type="button"
-        onClick={() => navigate("/lp/new")}
+        onClick={() => setIsLpModalOpen(true)}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-pink-500 text-3xl font-bold text-white shadow-lg transition hover:bg-pink-400"
       >
         +
       </button>
+
+      {isLpModalOpen && (
+        <CreateLpModal onClose={() => setIsLpModalOpen(false)} />
+      )}
     </div>
   );
 }

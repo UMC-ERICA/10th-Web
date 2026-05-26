@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { NavLink, useNavigate } from "react-router-dom";
+import { removeTokens } from "../router/auth";
+import { logout } from "../apis/user";
 
 type NavbarProps = {
   onOpenSidebar: () => void;
@@ -8,15 +12,44 @@ function Navbar({ onOpenSidebar }: NavbarProps) {
   const navigate = useNavigate();
 
   const accessToken = localStorage.getItem("accessToken");
-  const nickname = localStorage.getItem("nickname") || "사용자";
+  const [nickname, setNickname] = useState(
+  localStorage.getItem("nickname") || "사용자"
+  );
+
+  useEffect(() => {
+    const handleNicknameChange = () => {
+      setNickname(localStorage.getItem("nickname") || "사용자");
+    };
+
+    window.addEventListener("nickname-change", handleNicknameChange);
+
+    return () => {
+      window.removeEventListener("nickname-change", handleNicknameChange);
+    };
+  }, []);
+
   const isLoggedIn = Boolean(accessToken);
 
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+
+    onSettled: () => {
+      removeTokens();
+
+      localStorage.removeItem("nickname");
+      localStorage.removeItem("userId");
+
+      navigate("/");
+      window.location.reload();
+    },
+
+    onError: () => {
+      alert("로그아웃 중 오류가 발생했습니다.");
+    },
+  });
+
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("nickname");
-    navigate("/");
-    window.location.reload();
+    logoutMutation.mutate();
   };
 
   return (
@@ -48,9 +81,9 @@ function Navbar({ onOpenSidebar }: NavbarProps) {
 
           <NavLink
             to="/"
-            className="shrink-0 text-2xl font-extrabold tracking-wide text-white transition hover:text-violet-400"
+            className="shrink-0 text-2xl font-extrabold tracking-wide text-white transition hover:text-pink-400"
           >
-            LUMI 
+            LUMI
           </NavLink>
         </div>
 
@@ -59,13 +92,17 @@ function Navbar({ onOpenSidebar }: NavbarProps) {
 
           {isLoggedIn ? (
             <>
-              <span className="text-gray-200">{nickname}님 반갑습니다.</span>
+              <span className="text-gray-200">
+                {nickname}님 반갑습니다.
+              </span>
+
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-gray-300 transition hover:text-white"
+                disabled={logoutMutation.isPending}
+                className="text-gray-300 transition hover:text-white disabled:opacity-50"
               >
-                로그아웃
+                {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}
               </button>
             </>
           ) : (

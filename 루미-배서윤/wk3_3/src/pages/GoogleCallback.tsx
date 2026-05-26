@@ -1,16 +1,23 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { setTokens } from "../router/auth";
 
 export default function GoogleCallback() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const accessToken = searchParams.get("accessToken");
+    const refreshToken = searchParams.get("refreshToken");
     const userId = searchParams.get("userId");
     const name = searchParams.get("name");
+    const email = searchParams.get("email");
+
+    if (accessToken && refreshToken) {
+      setTokens(accessToken, refreshToken);
+    }
 
     if (userId) {
-      localStorage.setItem("accessToken", "google-login");
       localStorage.setItem("userId", userId);
     }
 
@@ -18,8 +25,16 @@ export default function GoogleCallback() {
       localStorage.setItem("nickname", decodeURIComponent(name));
     }
 
-    navigate("/", { replace: true });
-  }, [navigate, searchParams]);
+    if (email) {
+      localStorage.setItem("email", decodeURIComponent(email));
+    }
 
-  return <div className="text-white">구글 로그인 처리 중...</div>;
+    navigate("/lps", { replace: true });
+  }, [searchParams, navigate]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-black text-white">
+      로그인 처리 중...
+    </div>
+  );
 }

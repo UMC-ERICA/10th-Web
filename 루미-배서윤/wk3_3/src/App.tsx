@@ -16,6 +16,7 @@ import LpNew from "./pages/LpNew";
 
 import ProtectedRoute from "./router/ProtectedRoute";
 import Premium from "./pages/Premium";
+import MyPage from "./pages/MyPage";
 
 function App() {
   return (
@@ -29,9 +30,9 @@ function App() {
           <Route path="top-rated" element={<TopRated />} />
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<MovieDetail />} />
-          <Route path="/v1/auth/google/callback" element={<GoogleCallback />} />
 
           <Route path="lps" element={<LpList />} />
+
           <Route
             path="lp/:lpid"
             element={
@@ -40,9 +41,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route path="lp/new" element={<LpNew />} />
 
-          {/* 보호된 라우트 */}
           <Route
             path="premium"
             element={
@@ -51,11 +52,24 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* 인증 관련 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/v1/auth/google/callback"
+          element={<GoogleCallback />}
+        />
       </Routes>
     </BrowserRouter>
   );
