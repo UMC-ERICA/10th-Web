@@ -1,4 +1,3 @@
-import axios from "axios";
 import type { LikeResponseDto, LpResponseDto } from "../types/music";
 import type {
   CommonResponse,
@@ -10,8 +9,8 @@ import { axiosinstance } from "./axios";
 export const getLps = async (
   paginationDto: PaginationDto,
 ): Promise<CommonResponse<LpResponseDto>> => {
-  const response = await axios.get<CommonResponse<LpResponseDto>>(
-    "http://localhost:8000/v1/lps",
+  const response = await axiosinstance.get<CommonResponse<LpResponseDto>>(
+    `/v1/lps`,
     {
       params: paginationDto,
     },
@@ -25,7 +24,7 @@ export const getLps = async (
 
 export const fetchLpDetail = async (lpId: number) => {
   try {
-    const response = await axios.get(`http://localhost:8000/v1/lps/${lpId}`);
+    const response = await axiosinstance.get(`/v1/lps/${lpId}`);
     if (response.status !== 200) {
       throw new Error("Failed to fetch lp detail");
     }
@@ -41,7 +40,7 @@ export const getComments = async (
   paginationDto: PaginationDto,
 ): Promise<CommonResponse<CommentResponseDto>> => {
   const response = await axiosinstance.get<CommonResponse<CommentResponseDto>>(
-    `http://localhost:8000/v1/lps/${lpId}/comments`,
+    `/v1/lps/${lpId}/comments`,
     {
       params: paginationDto,
     },
@@ -53,12 +52,9 @@ export const getComments = async (
 };
 
 export const createComment = async (lpId: number, content: string) => {
-  const response = await axiosinstance.post(
-    `http://localhost:8000/v1/lps/${lpId}/comments`,
-    {
-      content,
-    },
-  );
+  const response = await axiosinstance.post(`/v1/lps/${lpId}/comments`, {
+    content,
+  });
   console.log(response.data);
   return response.data;
 };
@@ -76,7 +72,7 @@ export const createLp = async ({
   thumbnail: string;
   published: boolean;
 }) => {
-  const response = await axiosinstance.post("http://localhost:8000/v1/lps", {
+  const response = await axiosinstance.post("/v1/lps", {
     title,
     content,
     tags,
@@ -87,16 +83,12 @@ export const createLp = async ({
 };
 
 export const postLike = async (lpId: number): Promise<LikeResponseDto> => {
-  const response = await axiosinstance.post(
-    `http://localhost:8000/v1/lps/${lpId}/likes`,
-  );
+  const response = await axiosinstance.post(`/v1/lps/${lpId}/likes`);
   return response.data;
 };
 
 export const deleteLike = async (lpId: number): Promise<LikeResponseDto> => {
-  const response = await axiosinstance.delete(
-    `http://localhost:8000/v1/lps/${lpId}/likes`,
-  );
+  const response = await axiosinstance.delete(`/v1/lps/${lpId}/likes`);
   return response.data;
 };
 
@@ -105,7 +97,7 @@ export const deleteComment = async (
   commentId: number,
 ): Promise<CommentResponseDto> => {
   const response = await axiosinstance.delete(
-    `http://localhost:8000/v1/lps/${lpId}/comments/${commentId}`,
+    `/v1/lps/${lpId}/comments/${commentId}`,
   );
   return response.data;
 };
@@ -116,7 +108,7 @@ export const updateComment = async (
   content: string,
 ): Promise<CommentResponseDto> => {
   const response = await axiosinstance.patch(
-    `http://localhost:8000/v1/lps/${lpId}/comments/${commentId}`,
+    `/v1/lps/${lpId}/comments/${commentId}`,
     {
       content,
     },

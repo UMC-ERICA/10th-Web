@@ -6,14 +6,18 @@ import { useGetMyInfo } from "../hooks/useGetMyInfo";
 import useLogout from "../hooks/mutations/useLogout";
 import useWithdrawAccount from "../hooks/mutations/useWithdrawAccount";
 import ConfirmModal from "../components/ConfirmModal";
+import { useSidebar } from "../hooks/useSidebar";
 
 const HomeLayout = () => {
   const { accessToken } = useAuth();
   const { data: myInfo } = useGetMyInfo(!!accessToken);
   const { category } = useParams<{ category: string }>();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isOpen, close, toggle } = useSidebar();
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(
+    null,
+  );
 
   const { mutate: logoutMutation, isPending: isLoggingOut } = useLogout();
   const { mutate: withdrawMutation, isPending: isWithdrawing } =
@@ -31,14 +35,16 @@ const HomeLayout = () => {
       },
     });
   };
-
   return (
     <div className="flex h-dvh min-h-0 flex-col text-sm">
       <nav className="flex h-15 justify-between  items-center px-3 py-2 bg-gray-100">
         <div className="flex items-center gap-3 font-bold">
           <button
+            type="button"
             className="lg:hidden"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="메뉴 열기"
+            aria-expanded={isOpen}
+            onClick={toggle}
           >
             <svg
               width="35"
@@ -100,16 +106,18 @@ const HomeLayout = () => {
           )}
         </div>
       </nav>
-      <main className="min-h-0 flex-1 overflow-auto  flex flex-row gap-3 relative">
+      <main
+        ref={setScrollContainer}
+        id="app-scroll-main"
+        className="relative flex min-h-0 flex-1 flex-row gap-3 overflow-y-auto"
+      >
         <div
-          className={`z-10 bg-gray-300 flex flex-col h-full gap-2 fixed w-[300px] left-[-100%] top-15 p-3 shadow-lg transition-all duration-300 ${!sidebarOpen ? "" : "left-[0%]"} lg:left-[0%] `}
+          className={`z-10 bg-gray-300 flex flex-col h-full gap-2 fixed w-[300px] left-[-100%] top-15 p-3 shadow-lg transition-all duration-300 ${!isOpen ? "" : "left-[0%]"} lg:left-[0%] `}
         >
           <NavLink
             className={category === "find" ? "text-red-500" : ""}
             to="/lps"
-            onClick={() => {
-              setSidebarOpen(false);
-            }}
+            onClick={close}
           >
             찾기
           </NavLink>
@@ -117,9 +125,7 @@ const HomeLayout = () => {
           <NavLink
             to="/mypage"
             className={({ isActive }) => (isActive ? "font-semibold" : "")}
-            onClick={() => {
-              setSidebarOpen(false);
-            }}
+            onClick={close}
           >
             마이페이지
           </NavLink>
@@ -129,7 +135,7 @@ const HomeLayout = () => {
               type="button"
               className="text-left text-red-600 hover:underline"
               onClick={() => {
-                setSidebarOpen(false);
+                close();
                 setWithdrawModalOpen(true);
               }}
             >
@@ -138,12 +144,12 @@ const HomeLayout = () => {
           )}
         </div>
         <div
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className={`${sidebarOpen ? "block" : "hidden"} fixed bg-[#12121200] w-full h-full top-0 left-0 z-9 lg:hidden`}
+          onClick={close}
+          className={`${isOpen ? "block" : "hidden"} fixed bg-[#12121200] w-full h-full top-0 left-0 z-9 lg:hidden`}
         ></div>
 
-        <div className="w-full  h-full transition-all duration-300 lg:pl-[300px]">
-          <Outlet context={{ myInfo: myInfo }} />
+        <div className="w-full min-w-0 flex-1 transition-all duration-300 lg:pl-[300px]">
+          <Outlet context={{ myInfo, scrollContainer }} />
           <footer className="shrink-0 px-3 py-2 text-xs">
             <p>푸터 제비의 LP사이트.</p>
           </footer>

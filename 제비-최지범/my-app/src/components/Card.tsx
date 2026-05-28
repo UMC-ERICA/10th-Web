@@ -3,24 +3,29 @@ import type { LP } from "../types/music";
 
 const Card = ({ id, title, thumbnail, createdAt, likes }: LP) => {
   const nav = useNavigate();
+
   return (
-    <div
+    <article
       onClick={() => nav(`/lps/${id}`)}
-      className="bg-gray-100  mb-2 rounded-lg shadow-md flex flex-col gap-2"
+      className="mb-2 cursor-pointer overflow-hidden rounded-lg bg-gray-100 shadow-md transition-shadow duration-300 hover:shadow-lg"
     >
-      <div className="w-full aspect-square relative">
-        <img src={thumbnail} className="h-full w-full object-cover" />
-        <div className="hover:opacity-100 opacity-0 transition-opacity duration-300 absolute top-0 left-0 w-full h-full p-4 flex flex-col justify-end backdrop-blur-md bg-black/50 bg-opacity-50">
-          <h4 className="text-white text-xl font-bold">{title}</h4>{" "}
-          <div className="flex justify-between items-center mb-2">
+      <div className="relative aspect-square w-full overflow-hidden [&:hover_.card-overlay]:opacity-100 [&:hover_img]:scale-105">
+        <img
+          src={thumbnail}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-300"
+        />
+        <div className="card-overlay pointer-events-none absolute inset-0 z-10 flex flex-col justify-end bg-black/60 p-4 opacity-0 transition-opacity duration-300">
+          <h4 className="text-xl font-bold text-white">{title}</h4>
+          <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-[0.6rem] text-white">{createdAt}</p>
-            <p className="text-sm text-white text-right">
-              {likes.length} 좋아요
+            <p className="text-right text-sm text-white">
+              {likes?.length ?? 0} 좋아요
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
