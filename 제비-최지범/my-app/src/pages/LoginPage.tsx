@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import useLogin from "../hooks/mutations/useLogin";
 import { useForm } from "../hooks/useForm";
 import { loginFormSchema, type LoginFormValues } from "../schemas/loginSchema";
 
@@ -7,7 +7,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { login } = useAuth();
+  const { mutate: login, isPending } = useLogin();
   const signedUp = Boolean(
     (location.state as { signedUp?: boolean } | null)?.signedUp,
   );
@@ -28,7 +28,7 @@ const LoginPage = () => {
     register,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     schema: loginFormSchema,
     defaultValues: {
@@ -37,20 +37,20 @@ const LoginPage = () => {
     },
   });
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      await login(data);
-      const from = searchParams.get("from");
-      const target =
-        from && from.startsWith("/") && !from.startsWith("//")
-          ? from
-          : "/";
-      navigate(target, { replace: true });
-    } catch {
-      setError("root", {
-        message: "이메일 또는 비밀번호가 올바르지 않습니다.",
-      });
-    }
+  const onSubmit = handleSubmit((data) => {
+    login(data, {
+      onSuccess: () => {
+        const from = searchParams.get("from");
+        const target =
+          from && from.startsWith("/") && !from.startsWith("//") ? from : "/";
+        navigate(target, { replace: true });
+      },
+      onError: () => {
+        setError("root", {
+          message: "이메일 또는 비밀번호가 올바르지 않습니다.",
+        });
+      },
+    });
   });
 
   return (
@@ -119,10 +119,10 @@ const LoginPage = () => {
         )}
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isPending}
           className="rounded border border-gray-400 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 disabled:opacity-50"
         >
-          {isSubmitting ? "로그인 중…" : "로그인"}
+          {isPending ? "로그인 중…" : "로그인"}
         </button>
       </form>
       <p className="text-center text-sm text-gray-600">

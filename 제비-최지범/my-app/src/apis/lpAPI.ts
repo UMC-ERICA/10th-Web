@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { LpResponseDto } from "../types/music";
+import type { LikeResponseDto, LpResponseDto } from "../types/music";
 import type {
   CommonResponse,
   PaginationDto,
@@ -60,5 +60,66 @@ export const createComment = async (lpId: number, content: string) => {
     },
   );
   console.log(response.data);
+  return response.data;
+};
+
+export const createLp = async ({
+  title,
+  content,
+  tags,
+  thumbnail,
+  published,
+}: {
+  title: string;
+  content: string;
+  tags: string[];
+  thumbnail: string;
+  published: boolean;
+}) => {
+  const response = await axiosinstance.post("http://localhost:8000/v1/lps", {
+    title,
+    content,
+    tags,
+    thumbnail,
+    published,
+  });
+  return response.data;
+};
+
+export const postLike = async (lpId: number): Promise<LikeResponseDto> => {
+  const response = await axiosinstance.post(
+    `http://localhost:8000/v1/lps/${lpId}/likes`,
+  );
+  return response.data;
+};
+
+export const deleteLike = async (lpId: number): Promise<LikeResponseDto> => {
+  const response = await axiosinstance.delete(
+    `http://localhost:8000/v1/lps/${lpId}/likes`,
+  );
+  return response.data;
+};
+
+export const deleteComment = async (
+  lpId: number,
+  commentId: number,
+): Promise<CommentResponseDto> => {
+  const response = await axiosinstance.delete(
+    `http://localhost:8000/v1/lps/${lpId}/comments/${commentId}`,
+  );
+  return response.data;
+};
+
+export const updateComment = async (
+  lpId: number,
+  commentId: number,
+  content: string,
+): Promise<CommentResponseDto> => {
+  const response = await axiosinstance.patch(
+    `http://localhost:8000/v1/lps/${lpId}/comments/${commentId}`,
+    {
+      content,
+    },
+  );
   return response.data;
 };

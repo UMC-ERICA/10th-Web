@@ -6,11 +6,9 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import type { RequestSigninDto } from "../types/auth";
 import { registerAuthSync } from "../apis/authSync";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
-import { postSignin } from "../apis/auth";
 import {
   clearGoogleOAuthSessionDedupeKeys,
   getStoredAccessToken,
@@ -20,18 +18,16 @@ import {
 interface AuthContextType {
   accessToken: string | null;
   refreshToken: string | null;
-  login: (signinData: RequestSigninDto) => Promise<void>;
   /** OAuth 등 서버에서 발급한 토큰을 그대로 세션에 반영 */
   setTokens: (accessToken: string, refreshToken: string) => void;
-  logout: () => Promise<void>;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   refreshToken: null,
-  login: async () => {},
   setTokens: () => {},
-  logout: async () => {},
+  logout: () => {},
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
@@ -67,18 +63,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     });
   }, [removeAccessTokenFromStorage, removeRefreshTokenFromStorage]);
 
-  const login = useCallback(
-    async (signinData: RequestSigninDto) => {
-      const res = await postSignin(signinData);
-      const { accessToken: nextAccess, refreshToken: nextRefresh } = res.data;
-      setAccessToken(nextAccess);
-      setRefreshToken(nextRefresh);
-      setAccessTokenInStorage(nextAccess);
-      setRefreshTokenInStorage(nextRefresh);
-    },
-    [setAccessTokenInStorage, setRefreshTokenInStorage],
-  );
-
   const setTokens = useCallback(
     (nextAccess: string, nextRefresh: string) => {
       setAccessToken(nextAccess);
@@ -89,7 +73,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     [setAccessTokenInStorage, setRefreshTokenInStorage],
   );
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(() => {
     setAccessToken(null);
     setRefreshToken(null);
     removeAccessTokenFromStorage();
@@ -101,11 +85,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     () => ({
       accessToken,
       refreshToken,
-      login,
       setTokens,
       logout,
     }),
-    [accessToken, refreshToken, login, setTokens, logout],
+    [accessToken, refreshToken, setTokens, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,3 +1,5 @@
+import type { CommonResponse } from "./common";
+
 export type LP = {
   id: number;
   title: string;
@@ -18,3 +20,9 @@ export type LpResponseDto = {
   nextCursor: number;
   hasNext: boolean;
 };
+
+export type LikeResponseDto = CommonResponse<{
+  id: number;
+  userId: number;
+  lpId: number;
+}>;

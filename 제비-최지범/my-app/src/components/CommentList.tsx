@@ -4,8 +4,13 @@ import type { PaginationDto } from "../types/common";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import CommentSkeleton from "./CommentSkeleton";
-import { createComment } from "../apis/lpAPI";
 import Comment from "./Comment";
+import usePostComment from "../hooks/mutations/usePostComment";
+import type { ResponseMyInfoDto } from "../types/auth";
+import { useOutletContext } from "react-router-dom";
+
+import useDeleteComment from "../hooks/mutations/useDeleteComment";
+import useUpdateComment from "../hooks/mutations/useUpdateComment";
 
 const CommentList = ({ setOpenCommentList }) => {
   const [content, setContent] = useState("");
@@ -15,6 +20,7 @@ const CommentList = ({ setOpenCommentList }) => {
     order: "asc",
   });
 
+  const { myInfo } = useOutletContext<{ myInfo: ResponseMyInfoDto["data"] }>();
   const {
     data,
     isPending,
@@ -23,8 +29,9 @@ const CommentList = ({ setOpenCommentList }) => {
     error,
     hasNextPage,
     fetchNextPage,
-    refetch,
   } = useGetInfinityCommentList(Number(lpId), paginationDto);
+
+  const { mutate: createCommentMutation } = usePostComment();
 
   const { ref, inView } = useInView({
     threshold: 0,
@@ -34,6 +41,16 @@ const CommentList = ({ setOpenCommentList }) => {
       !isFetching && hasNextPage && fetchNextPage();
     }
   }, [inView, fetchNextPage, isFetching, isPending, paginationDto]);
+
+  const { mutate: deleteCommentMutation } = useDeleteComment();
+  const { mutate: updateCommentMutation } = useUpdateComment();
+
+  const deleteComment = (commentId: number) => {
+    deleteCommentMutation({ lpId: Number(lpId), commentId });
+  };
+  const updateComment = (commentId: number, content: string) => {
+    updateCommentMutation({ lpId: Number(lpId), commentId, content });
+  };
 
   return (
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[90%] bg-gray-100 rounded-lg p-4 shadow-md">
@@ -78,6 +95,10 @@ const CommentList = ({ setOpenCommentList }) => {
               content={comment.content}
               createdAt={comment.createdAt}
               author={comment.author}
+              isMyComment={comment.author.id === myInfo?.id}
+              deleteComment={deleteComment}
+              updateComment={updateComment}
+              id={comment.id}
             />
           )),
         )}
@@ -100,9 +121,8 @@ const CommentList = ({ setOpenCommentList }) => {
         <button
           className="bg-black text-white h-full px-2 w-20 text-sm rounded-md"
           onClick={() => {
-            createComment(Number(lpId), content);
+            createCommentMutation({ lpId: Number(lpId), content: content });
             setContent("");
-            refetch();
           }}
         >
           작성

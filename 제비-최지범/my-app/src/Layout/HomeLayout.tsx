@@ -1,23 +1,36 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getMyInfo } from "../apis/auth";
-import type { ResponseMyInfoDto } from "../types/auth";
+import { useState } from "react";
+import { useGetMyInfo } from "../hooks/useGetMyInfo";
+import useLogout from "../hooks/mutations/useLogout";
+import useWithdrawAccount from "../hooks/mutations/useWithdrawAccount";
+import ConfirmModal from "../components/ConfirmModal";
 
 const HomeLayout = () => {
-  const { accessToken, logout } = useAuth();
-  const [myInfo, setMyInfo] = useState<ResponseMyInfoDto["data"] | null>(null);
+  const { accessToken } = useAuth();
+  const { data: myInfo } = useGetMyInfo(!!accessToken);
   const { category } = useParams<{ category: string }>();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (accessToken) {
-      getMyInfo().then((res) =>
-        setMyInfo(res.data as ResponseMyInfoDto["data"]),
-      );
-    }
-  }, [accessToken]);
+  const { mutate: logoutMutation, isPending: isLoggingOut } = useLogout();
+  const { mutate: withdrawMutation, isPending: isWithdrawing } =
+    useWithdrawAccount();
+
+  const handleLogout = () => {
+    logoutMutation();
+  };
+
+  const handleWithdrawConfirm = () => {
+    withdrawMutation(undefined, {
+      onSuccess: () => {
+        setWithdrawModalOpen(false);
+        navigate("/login", { replace: true });
+      },
+    });
+  };
 
   return (
     <div className="flex h-dvh min-h-0 flex-col text-sm">
@@ -36,9 +49,9 @@ const HomeLayout = () => {
               <path
                 fill="none"
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="4"
                 d="M7.95 11.95h32m-32 12h32m-32 12h32"
               />
             </svg>
@@ -57,8 +70,12 @@ const HomeLayout = () => {
             <>
               <div>환영합니다 {myInfo?.name} 님</div>
 
-              <button type="button" onClick={() => void logout()}>
-                로그아웃
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? "로그아웃 중…" : "로그아웃"}
               </button>
             </>
           ) : (
@@ -106,6 +123,19 @@ const HomeLayout = () => {
           >
             마이페이지
           </NavLink>
+
+          {accessToken && (
+            <button
+              type="button"
+              className="text-left text-red-600 hover:underline"
+              onClick={() => {
+                setSidebarOpen(false);
+                setWithdrawModalOpen(true);
+              }}
+            >
+              탈퇴하기
+            </button>
+          )}
         </div>
         <div
           onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -119,6 +149,17 @@ const HomeLayout = () => {
           </footer>
         </div>
       </main>
+
+      <ConfirmModal
+        open={withdrawModalOpen}
+        title="회원 탈퇴"
+        message="정말 탈퇴하시겠습니까? 탈퇴 시 게시글, 댓글, 좋아요 등 모든 정보가 삭제되며 복구할 수 없습니다."
+        confirmLabel="예"
+        cancelLabel="아니오"
+        isPending={isWithdrawing}
+        onConfirm={handleWithdrawConfirm}
+        onCancel={() => setWithdrawModalOpen(false)}
+      />
     </div>
   );
 };
