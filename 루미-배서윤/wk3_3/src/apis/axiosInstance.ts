@@ -10,7 +10,7 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 }
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: import.meta.env.VITE_SERVER_API_URL,
 });
 
 axiosInstance.interceptors.request.use((config) => {
@@ -25,17 +25,26 @@ axiosInstance.interceptors.request.use((config) => {
 
 axiosInstance.interceptors.response.use(
   (response) => response,
+
   async (error: AxiosError) => {
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = getRefreshToken();
 
+        if (!refreshToken) {
+          throw new Error("RefreshToken 없음");
+        }
+
         const response = await axios.post(
-          "http://localhost:8000/v1/auth/refresh",
+          `${import.meta.env.VITE_SERVER_API_URL}/v1/auth/refresh`,
           {},
           {
             headers: {
@@ -44,7 +53,13 @@ axiosInstance.interceptors.response.use(
           }
         );
 
-        const newAccessToken = response.data.accessToken;
+        const newAccessToken =
+          response.data?.data?.accessToken ??
+          response.data?.accessToken;
+
+        if (!newAccessToken) {
+          throw new Error("새 accessToken을 찾을 수 없습니다.");
+        }
 
         localStorage.setItem("accessToken", newAccessToken);
 
@@ -52,8 +67,12 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (refreshError) {
+        console.error("토큰 재발급 실패:", refreshError);
+
         removeTokens();
+
         window.location.href = "/login";
+
         return Promise.reject(refreshError);
       }
     }

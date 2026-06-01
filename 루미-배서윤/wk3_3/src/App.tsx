@@ -8,9 +8,15 @@ import NowPlaying from "./pages/NowPlaying";
 import MovieDetail from "./pages/MovieDetail";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import GoogleCallback from "./pages/GoogleCallback";
+
+import LpList from "./pages/LpList";
+import LpDetail from "./pages/LpDetail";
+import LpNew from "./pages/LpNew";
 
 import ProtectedRoute from "./router/ProtectedRoute";
 import Premium from "./pages/Premium";
+import MyPage from "./pages/MyPage";
 
 function App() {
   return (
@@ -25,7 +31,19 @@ function App() {
           <Route path="now-playing" element={<NowPlaying />} />
           <Route path="movie/:id" element={<MovieDetail />} />
 
-          {/* 보호된 라우트 */}
+          <Route path="lps" element={<LpList />} />
+
+          <Route
+            path="lp/:lpid"
+            element={
+              <ProtectedRoute>
+                <LpDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="lp/new" element={<LpNew />} />
+
           <Route
             path="premium"
             element={
@@ -34,11 +52,24 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* 인증 관련 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/v1/auth/google/callback"
+          element={<GoogleCallback />}
+        />
       </Routes>
     </BrowserRouter>
   );

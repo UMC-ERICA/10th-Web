@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +17,8 @@ type EmailFormValues = z.infer<typeof emailSchema>;
 
 export default function Signup() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [signupData, setSignupData] = useState({
     email: "",
@@ -24,11 +27,15 @@ export default function Signup() {
     nickname: "",
   });
 
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [nicknameError, setNicknameError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -108,6 +115,42 @@ export default function Signup() {
     }
   };
 
+  const handleProfileImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    setProfileImage(file);
+    setProfilePreview(URL.createObjectURL(file));
+  };
+
+  const handleSignup = async () => {
+    if (!isNicknameValid) return;
+
+    try {
+      setIsSubmitting(true);
+
+      await axios.post("http://localhost:8000/v1/auth/signup", {
+        email: signupData.email,
+        password: signupData.password,
+        name: signupData.nickname,
+      });
+
+      alert("회원가입 완료");
+      navigate("/login");
+    } catch (error: any) {
+      console.error("회원가입 실패:", error);
+      console.error("응답 상태:", error.response?.status);
+      console.error("응답 데이터:", error.response?.data);
+
+      alert(error.response?.data?.message || "회원가입 실패");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const isPasswordValid =
     signupData.password.trim().length >= 6 &&
     signupData.confirmPassword.trim().length >= 6 &&
@@ -137,7 +180,9 @@ export default function Signup() {
           &lt;
         </button>
 
-        <h1 className="mb-10 text-center text-2xl font-extrabold">회원가입</h1>
+        <h1 className="mb-10 text-center text-2xl font-extrabold">
+          회원가입
+        </h1>
 
         {step === 1 && (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -145,12 +190,14 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-gray-300">
                 이메일
               </label>
+
               <input
                 type="email"
                 placeholder="이메일을 입력해주세요."
                 {...register("email")}
                 className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
               />
+
               {errors.email && (
                 <p className="mt-2 text-sm text-red-400">
                   {errors.email.message}
@@ -187,6 +234,7 @@ export default function Signup() {
                   onChange={handlePasswordChange}
                   className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 pr-12 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
@@ -195,8 +243,11 @@ export default function Signup() {
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
+
               {passwordError && (
-                <p className="mt-2 text-sm text-red-400">{passwordError}</p>
+                <p className="mt-2 text-sm text-red-400">
+                  {passwordError}
+                </p>
               )}
             </div>
 
@@ -209,6 +260,7 @@ export default function Signup() {
                   onChange={handleConfirmPasswordChange}
                   className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 pr-12 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
@@ -217,6 +269,7 @@ export default function Signup() {
                   {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
+
               {confirmPasswordError && (
                 <p className="mt-2 text-sm text-red-400">
                   {confirmPasswordError}
@@ -227,9 +280,7 @@ export default function Signup() {
             <button
               type="button"
               disabled={!isPasswordValid}
-              onClick={() => {
-                setStep(3);
-              }}
+              onClick={() => setStep(3)}
               className={`w-full rounded-md py-3 font-semibold transition ${
                 isPasswordValid
                   ? "bg-pink-500 text-white hover:bg-pink-400"
@@ -248,10 +299,33 @@ export default function Signup() {
             </div>
 
             <div className="flex flex-col items-center justify-center space-y-3">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-800 text-3xl text-gray-400">
-                +
-              </div>
-              <p className="text-sm text-gray-400">프로필 이미지</p>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-3xl text-gray-400"
+              >
+                {profilePreview ? (
+                  <img
+                    src={profilePreview}
+                    alt="profile"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  "+"
+                )}
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+                className="hidden"
+              />
+
+              <p className="text-sm text-gray-400">
+                프로필 이미지
+              </p>
             </div>
 
             <div>
@@ -262,26 +336,25 @@ export default function Signup() {
                 onChange={handleNicknameChange}
                 className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
               />
+
               {nicknameError && (
-                <p className="mt-2 text-sm text-red-400">{nicknameError}</p>
+                <p className="mt-2 text-sm text-red-400">
+                  {nicknameError}
+                </p>
               )}
             </div>
 
             <button
               type="button"
-              disabled={!isNicknameValid}
-              onClick={() => {
-                alert("회원가입 완료");
-                console.log(signupData);
-                navigate("/");
-              }}
+              disabled={!isNicknameValid || isSubmitting}
+              onClick={handleSignup}
               className={`w-full rounded-md py-3 font-semibold transition ${
-                isNicknameValid
+                isNicknameValid && !isSubmitting
                   ? "bg-pink-500 text-white hover:bg-pink-400"
                   : "cursor-not-allowed bg-gray-700 text-gray-400"
               }`}
             >
-              회원가입 완료
+              {isSubmitting ? "가입 중..." : "회원가입 완료"}
             </button>
           </div>
         )}
