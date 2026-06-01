@@ -2,21 +2,27 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getLps } from "../apis/lpAPI";
 
 export default function useGetInfinityLpList(
-  limit: number,
   search: string,
   order: "asc" | "desc",
 ) {
+  const trimmedSearch = search.trim();
+  const isWhitespaceOnly = search.length > 0 && trimmedSearch.length === 0;
+
   return useInfiniteQuery({
-    queryKey: ["lps", "infinite", search, order],
+    enabled: !isWhitespaceOnly,
+    queryKey: ["lps", "infinite", trimmedSearch, order],
     queryFn: ({ pageParam = 0 }) =>
       getLps({
         cursor: pageParam,
-        search: search,
+        search: trimmedSearch,
         order: order,
       }),
-    initialPageParam: undefined as number | undefined,
+    initialPageParam: 0,
     getNextPageParam: (lastPage) => {
       return lastPage.data.hasNext ? lastPage.data.nextCursor : undefined;
     },
+    staleTime: 30_000,
+    gcTime: 5 * 60 * 1000,
+    retry: 1,
   });
 }

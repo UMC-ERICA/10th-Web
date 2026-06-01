@@ -2,13 +2,22 @@ import type { LP } from "../types/music";
 
 import { useEffect, useState, useRef } from "react";
 import type { PaginationDto } from "../types/common";
+import { useOutletContext } from "react-router-dom";
 import useGetInfinityLpList from "../hooks/useGetInfinityLpList";
 import { useInView } from "react-intersection-observer";
 import Card from "../components/Card";
 import CardSkeleton from "../components/CardSkeleton";
 import useCreateLp from "../hooks/mutations/useCreateLp";
+import { useDebounce } from "../hooks/useDebounce";
+import { useThrottle } from "../hooks/useThrottle";
+
+const SCROLL_THROTTLE_MS = 5060;
 
 const LpList = () => {
+  const { scrollContainer } = useOutletContext<{
+    scrollContainer: HTMLElement | null;
+  }>();
+
   const [openModal, seOpenModal] = useState(false);
   const [lpAddData, setLpAddData] = useState({
     title: "",
@@ -19,13 +28,33 @@ const LpList = () => {
   });
   const [paginationDto, setPaginationDto] = useState<PaginationDto>({
     limit: 10,
-    search: "",
     order: "asc",
   });
+  const [searchInput, setSearchInput] = useState("");
+  const [scrollTick, setScrollTick] = useState(0);
+  const throttledScrollTick = useThrottle(scrollTick, SCROLL_THROTTLE_MS);
+  const lastFetchedTick = useRef(0);
+
+  const debouncedSearchInput = useDebounce(searchInput, 600);
   const tagsRef = useRef<HTMLInputElement>(null);
+
   const handleOnchangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLpAddData({ ...lpAddData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (!scrollContainer) return;
+
+    const onScroll = () => setScrollTick((prev) => prev + 1);
+    scrollContainer.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollContainer.removeEventListener("scroll", onScroll);
+  }, [scrollContainer]);
+
+  useEffect(() => {
+    if (scrollTick === 0) return;
+    console.log("throttled scroll tick:", throttledScrollTick);
+  }, [throttledScrollTick, scrollTick]);
+
   const closeModal = () => {
     seOpenModal(false);
     setLpAddData({
@@ -91,19 +120,32 @@ const LpList = () => {
     error,
     hasNextPage,
     fetchNextPage,
-  } = useGetInfinityLpList(
-    paginationDto.limit,
-    paginationDto.search,
-    paginationDto.order,
-  );
+  } = useGetInfinityLpList(debouncedSearchInput, paginationDto.order);
+
   const { ref, inView } = useInView({
     threshold: 0,
+    root: scrollContainer,
   });
+
   useEffect(() => {
-    if (inView) {
-      !isFetching && hasNextPage && fetchNextPage();
-    }
-  }, [inView, fetchNextPage, isFetching, isPending]);
+    lastFetchedTick.current = 0;
+  }, [debouncedSearchInput, paginationDto.order]);
+
+  useEffect(() => {
+    if (!inView || !hasNextPage || isFetching || isPending) return;
+    if (throttledScrollTick === 0) return;
+    if (throttledScrollTick === lastFetchedTick.current) return;
+    console.log("fetchNextPage");
+    lastFetchedTick.current = throttledScrollTick;
+    fetchNextPage();
+  }, [
+    throttledScrollTick,
+    inView,
+    hasNextPage,
+    isFetching,
+    isPending,
+    fetchNextPage,
+  ]);
 
   return (
     <div className="relative">
@@ -111,9 +153,8 @@ const LpList = () => {
       <input
         type="text"
         placeholder="검색"
-        onChange={(e) =>
-          setPaginationDto({ ...paginationDto, search: e.target.value })
-        }
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
       />
       <div className="flex gap-2 justify-end">
         <button
@@ -141,7 +182,8 @@ const LpList = () => {
           ))}
       </div>
 
-      <div ref={ref}>{inView && "-"}</div>
+      <div ref={ref} className="h-4" />
+
       <button
         onClick={() => seOpenModal(true)}
         className="fixed right-10 bottom-10 w-10 h-10 bg-red-500 text-white rounded-full text-2xl text-center items-center justify-center"
@@ -158,7 +200,10 @@ const LpList = () => {
             <button onClick={() => closeModal()}>X</button>
           </div>
           <div className="flex flex-col gap-2 mt-4">
-            <img src={lpAddData.thumbnail} alt="썸네일" />
+            <img
+              src={lpAddData.thumbnail || "https://placehold.co/600x400"}
+              alt="썸네일"
+            />
             <input
               type="text"
               placeholder="제목"
