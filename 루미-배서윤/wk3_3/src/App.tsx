@@ -13,6 +13,7 @@ import GoogleCallback from "./pages/GoogleCallback";
 import LpList from "./pages/LpList";
 import LpDetail from "./pages/LpDetail";
 import LpNew from "./pages/LpNew";
+import Cart from "./pages/Cart";
 
 import ProtectedRoute from "./router/ProtectedRoute";
 import Premium from "./pages/Premium";
@@ -32,6 +33,7 @@ function App() {
           <Route path="movie/:id" element={<MovieDetail />} />
 
           <Route path="lps" element={<LpList />} />
+          <Route path="cart" element={<Cart />} />
 
           <Route
             path="lp/:lpid"
