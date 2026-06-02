@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import FormInput from "../components/ui/FormInput";
+import Button from "../components/ui/Button";
 
 const emailSchema = z.object({
   email: z
@@ -27,9 +29,7 @@ export default function Signup() {
     nickname: "",
   });
 
-  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
-
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [nicknameError, setNicknameError] = useState("");
@@ -44,107 +44,57 @@ export default function Signup() {
   } = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
     mode: "onChange",
-    defaultValues: {
-      email: signupData.email,
-    },
+    defaultValues: { email: signupData.email },
   });
 
   const onSubmit = (data: EmailFormValues) => {
-    setSignupData((prev) => ({
-      ...prev,
-      email: data.email,
-    }));
+    setSignupData((prev) => ({ ...prev, email: data.email }));
     setStep(2);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
-    setSignupData((prev) => ({
-      ...prev,
-      password: value,
-    }));
-
-    if (value.length > 0 && value.length < 6) {
-      setPasswordError("비밀번호는 6자 이상이어야 합니다.");
-    } else {
-      setPasswordError("");
-    }
-
-    if (
-      signupData.confirmPassword.length > 0 &&
-      value !== signupData.confirmPassword
-    ) {
+    setSignupData((prev) => ({ ...prev, password: value }));
+    setPasswordError(value.length > 0 && value.length < 6 ? "비밀번호는 6자 이상이어야 합니다." : "");
+    if (signupData.confirmPassword.length > 0 && value !== signupData.confirmPassword) {
       setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
     } else {
       setConfirmPasswordError("");
     }
   };
 
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
-    setSignupData((prev) => ({
-      ...prev,
-      confirmPassword: value,
-    }));
-
-    if (value.length > 0 && value !== signupData.password) {
-      setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
-    } else {
-      setConfirmPasswordError("");
-    }
+    setSignupData((prev) => ({ ...prev, confirmPassword: value }));
+    setConfirmPasswordError(value.length > 0 && value !== signupData.password ? "비밀번호가 일치하지 않습니다." : "");
   };
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
-    setSignupData((prev) => ({
-      ...prev,
-      nickname: value,
-    }));
-
-    if (value.trim().length === 0) {
-      setNicknameError("닉네임을 입력해주세요.");
-    } else if (value.trim().length < 2) {
-      setNicknameError("닉네임은 2자 이상이어야 합니다.");
-    } else {
-      setNicknameError("");
-    }
+    setSignupData((prev) => ({ ...prev, nickname: value }));
+    if (value.trim().length === 0) setNicknameError("닉네임을 입력해주세요.");
+    else if (value.trim().length < 2) setNicknameError("닉네임은 2자 이상이어야 합니다.");
+    else setNicknameError("");
   };
 
-  const handleProfileImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
-
-    setProfileImage(file);
     setProfilePreview(URL.createObjectURL(file));
   };
 
   const handleSignup = async () => {
     if (!isNicknameValid) return;
-
     try {
       setIsSubmitting(true);
-
       await axios.post("http://localhost:8000/v1/auth/signup", {
         email: signupData.email,
         password: signupData.password,
         name: signupData.nickname,
       });
-
       alert("회원가입 완료");
       navigate("/login");
     } catch (error: any) {
-      console.error("회원가입 실패:", error);
-      console.error("응답 상태:", error.response?.status);
-      console.error("응답 데이터:", error.response?.data);
-
       alert(error.response?.data?.message || "회원가입 실패");
     } finally {
       setIsSubmitting(false);
@@ -158,8 +108,7 @@ export default function Signup() {
     !passwordError &&
     !confirmPasswordError;
 
-  const isNicknameValid =
-    signupData.nickname.trim().length >= 2 && !nicknameError;
+  const isNicknameValid = signupData.nickname.trim().length >= 2 && !nicknameError;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-black px-4 text-white">
@@ -167,22 +116,16 @@ export default function Signup() {
         <button
           type="button"
           onClick={() => {
-            if (step === 3) {
-              setStep(2);
-            } else if (step === 2) {
-              setStep(1);
-            } else {
-              navigate(-1);
-            }
+            if (step === 3) setStep(2);
+            else if (step === 2) setStep(1);
+            else navigate(-1);
           }}
           className="mb-8 text-2xl text-white"
         >
           &lt;
         </button>
 
-        <h1 className="mb-10 text-center text-2xl font-extrabold">
-          회원가입
-        </h1>
+        <h1 className="mb-10 text-center text-2xl font-extrabold">회원가입</h1>
 
         {step === 1 && (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -190,32 +133,17 @@ export default function Signup() {
               <label className="mb-2 block text-sm font-medium text-gray-300">
                 이메일
               </label>
-
-              <input
+              <FormInput
                 type="email"
                 placeholder="이메일을 입력해주세요."
+                error={errors.email?.message}
                 {...register("email")}
-                className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
               />
-
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-400">
-                  {errors.email.message}
-                </p>
-              )}
             </div>
 
-            <button
-              type="submit"
-              disabled={!isValid}
-              className={`w-full rounded-md py-3 font-semibold transition ${
-                isValid
-                  ? "bg-pink-500 text-white hover:bg-pink-400"
-                  : "cursor-not-allowed bg-gray-700 text-gray-400"
-              }`}
-            >
+            <Button type="submit" fullWidth disabled={!isValid}>
               다음
-            </button>
+            </Button>
           </form>
         )}
 
@@ -227,68 +155,47 @@ export default function Signup() {
 
             <div>
               <div className="relative">
-                <input
+                <FormInput
                   type={showPassword ? "text" : "password"}
                   placeholder="비밀번호"
                   value={signupData.password}
                   onChange={handlePasswordChange}
-                  className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 pr-12 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
+                  className="pr-12"
+                  error={passwordError}
                 />
-
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-4 top-[14px] text-gray-400"
                 >
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
-
-              {passwordError && (
-                <p className="mt-2 text-sm text-red-400">
-                  {passwordError}
-                </p>
-              )}
             </div>
 
             <div>
               <div className="relative">
-                <input
+                <FormInput
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="비밀번호 재확인"
                   value={signupData.confirmPassword}
                   onChange={handleConfirmPasswordChange}
-                  className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 pr-12 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
+                  className="pr-12"
+                  error={confirmPasswordError}
                 />
-
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  className="absolute right-4 top-[14px] text-gray-400"
                 >
                   {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
-
-              {confirmPasswordError && (
-                <p className="mt-2 text-sm text-red-400">
-                  {confirmPasswordError}
-                </p>
-              )}
             </div>
 
-            <button
-              type="button"
-              disabled={!isPasswordValid}
-              onClick={() => setStep(3)}
-              className={`w-full rounded-md py-3 font-semibold transition ${
-                isPasswordValid
-                  ? "bg-pink-500 text-white hover:bg-pink-400"
-                  : "cursor-not-allowed bg-gray-700 text-gray-400"
-              }`}
-            >
+            <Button type="button" fullWidth disabled={!isPasswordValid} onClick={() => setStep(3)}>
               다음
-            </button>
+            </Button>
           </div>
         )}
 
@@ -305,16 +212,11 @@ export default function Signup() {
                 className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-3xl text-gray-400"
               >
                 {profilePreview ? (
-                  <img
-                    src={profilePreview}
-                    alt="profile"
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={profilePreview} alt="profile" className="h-full w-full object-cover" />
                 ) : (
                   "+"
                 )}
               </button>
-
               <input
                 ref={fileInputRef}
                 type="file"
@@ -322,40 +224,25 @@ export default function Signup() {
                 onChange={handleProfileImageChange}
                 className="hidden"
               />
-
-              <p className="text-sm text-gray-400">
-                프로필 이미지
-              </p>
+              <p className="text-sm text-gray-400">프로필 이미지</p>
             </div>
 
-            <div>
-              <input
-                type="text"
-                placeholder="닉네임을 입력해주세요."
-                value={signupData.nickname}
-                onChange={handleNicknameChange}
-                className="w-full rounded-md border border-gray-700 bg-zinc-900 px-4 py-3 text-white outline-none placeholder:text-gray-400 focus:border-pink-500"
-              />
+            <FormInput
+              type="text"
+              placeholder="닉네임을 입력해주세요."
+              value={signupData.nickname}
+              onChange={handleNicknameChange}
+              error={nicknameError}
+            />
 
-              {nicknameError && (
-                <p className="mt-2 text-sm text-red-400">
-                  {nicknameError}
-                </p>
-              )}
-            </div>
-
-            <button
+            <Button
               type="button"
+              fullWidth
               disabled={!isNicknameValid || isSubmitting}
               onClick={handleSignup}
-              className={`w-full rounded-md py-3 font-semibold transition ${
-                isNicknameValid && !isSubmitting
-                  ? "bg-pink-500 text-white hover:bg-pink-400"
-                  : "cursor-not-allowed bg-gray-700 text-gray-400"
-              }`}
             >
               {isSubmitting ? "가입 중..." : "회원가입 완료"}
-            </button>
+            </Button>
           </div>
         )}
       </div>

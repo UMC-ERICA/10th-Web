@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createLp } from "../apis/lp";
+import Modal from "./ui/Modal";
 
 const lpImage = "/lp.png";
 
@@ -70,14 +71,8 @@ export default function CreateLpModal({ onClose }: Props) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-[500px] rounded-2xl bg-[#28292f] px-7 pb-7 pt-8 text-white shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
+    <Modal onClose={onClose}>
+      <div className="relative w-[500px] rounded-2xl bg-[#28292f] px-7 pb-7 pt-8 text-white shadow-xl">
         <button
           type="button"
           onClick={onClose}
@@ -208,6 +203,6 @@ export default function CreateLpModal({ onClose }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
