@@ -149,7 +149,7 @@ const MoviesPage = () => {
             name="language"
             value={language}
             onChange={handleLanguageChange}
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
+            className="w-full p-2 border border-gray-300  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
           >
             <option className="text-gray-700" value="ko-KR">
               한국어
