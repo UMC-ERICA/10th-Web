@@ -5,6 +5,7 @@ export type Movie = {
   poster_path: string;
   release_date: string;
   vote_average: number;
+  popularity: number;
   // 필요하다면 추가 필드도 정의 가능
 };
 
@@ -22,7 +23,19 @@ export type MovieDetailResponse = {
   overview: string;
   runtime: number;
   vote_average: number;
+  popularity: number;
   genres: { id: number; name: string }[];
+};
+export type Video = {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+};
+export type VideoResponse = {
+  id: number;
+  results: Video[];
 };
 
 export type Member = {

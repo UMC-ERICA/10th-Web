@@ -1,7 +1,11 @@
-import React from "react";
+import CartList from "../components/CartList";
 
 const HomePage = () => {
-  return <div className="mt-40">제의 홈</div>;
+  return (
+    <div className="">
+      <CartList />
+    </div>
+  );
 };
 
 export default HomePage;
