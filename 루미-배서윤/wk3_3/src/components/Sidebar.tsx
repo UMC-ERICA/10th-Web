@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { deleteMyAccount } from "../apis/user";
 import { removeTokens } from "../router/auth";
 import DeleteAccountModal from "./DeleteAccountModal";
+import { useCartStore } from "../store/useCartStore";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -13,6 +14,7 @@ type SidebarProps = {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const cartAmount = useCartStore((state) => state.amount);
 
   const deleteAccountMutation = useMutation({
     mutationFn: deleteMyAccount,
@@ -41,10 +43,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         }`}
       >
         <nav className="flex flex-col gap-4 text-sm">
-          <button onClick={() => moveTo("/lps")} className="text-left">
-            LP 보기
-          </button>
-
           <button onClick={() => moveTo("/popular")} className="text-left">
             인기 영화
           </button>
@@ -59,6 +57,22 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <button onClick={() => moveTo("/top-rated")} className="text-left">
             높은 평점
+          </button>
+
+          <button onClick={() => moveTo("/lps")} className="text-left">
+            LP 보기
+          </button>
+
+          <button
+            onClick={() => moveTo("/cart")}
+            className="flex items-center gap-2 text-left"
+          >
+            <span>장바구니</span>
+            {cartAmount > 0 && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-pink-500 text-xs font-bold text-white">
+                {cartAmount}
+              </span>
+            )}
           </button>
 
           <button onClick={() => moveTo("/mypage")} className="text-left">

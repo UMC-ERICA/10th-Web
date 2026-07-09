@@ -85,7 +85,6 @@ export default function LpList() {
 
   const lps = data?.pages.flatMap((page) => page.data) ?? [];
 
-  // !!data 를 의존성으로 두어 초기 로딩 완료 후 observer 재설정
   useEffect(() => {
     if (!observerRef.current) return;
     const observer = new IntersectionObserver((entries) => {
@@ -97,7 +96,6 @@ export default function LpList() {
 
   useEffect(() => {
     if (throttledIntersecting && hasNextPage && !isFetchingNextPage) {
-      console.log("스크롤 감지됨: fetchNextPage 호출");
       fetchNextPage();
     }
   }, [throttledIntersecting, hasNextPage, isFetchingNextPage, fetchNextPage]);

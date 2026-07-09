@@ -1,26 +1,16 @@
+import Modal from './ui/Modal';
+
 type Props = {
   onClose: () => void;
   onConfirm: () => void;
   isPending: boolean;
 };
 
-export default function DeleteAccountModal({
-  onClose,
-  onConfirm,
-  isPending,
-}: Props) {
+export default function DeleteAccountModal({ onClose, onConfirm, isPending }: Props) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-      onClick={onClose}
-    >
-      <div
-        className="w-[360px] rounded-xl bg-zinc-900 p-8 text-center text-white"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 className="mb-6 text-lg font-normal">
-          정말 탈퇴하시겠습니까?
-        </h2>
+    <Modal onClose={onClose}>
+      <div className="w-[360px] rounded-xl bg-zinc-900 p-8 text-center text-white">
+        <h2 className="mb-6 text-lg font-normal">정말 탈퇴하시겠습니까?</h2>
 
         <div className="flex justify-center gap-4">
           <button
@@ -41,6 +31,6 @@ export default function DeleteAccountModal({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -4,12 +4,7 @@ import axiosInstance from "../apis/axiosInstance";
 const Premium = () => {
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const res = await axiosInstance.get("/v1/users/me"); 
-        console.log("데이터:", res.data);
-      } catch (err) {
-        console.error("에러:", err);
-      }
+      await axiosInstance.get("/v1/users/me");
     };
 
     fetchData();
